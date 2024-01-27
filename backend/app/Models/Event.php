@@ -13,6 +13,9 @@ class Event extends Model
         'name',
         'description',
         'genre_id',
+        'date',
+        'file_path',
+        'time',
         'length',
         'regular_ticket_price',
         'vip_ticket_price',
@@ -21,5 +24,10 @@ class Event extends Model
     public function genre()
     {
         return $this->belongsTo(Genre::class);
+    }
+
+    public function ageRating()
+    {
+        return $this->belongsTo(AgeRating::class);
     }
 }

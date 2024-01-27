@@ -16,7 +16,11 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->foreignId('genre_id')->constrained();
+            $table->date('date');
+            $table->time('time');
+            $table->string("file_path");
             $table->integer('length');
+            $table->foreignId('age_rating_id')->nullable()->constrained();
             $table->decimal('regular_ticket_price');
             $table->decimal('vip_ticket_price');
             $table->timestamps();

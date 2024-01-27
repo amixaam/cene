@@ -6,45 +6,58 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Laravel\Sanctum\PersonalAccessToken;
+use Laravel\Sanctum\TransientToken;
 
 class AuthController extends Controller
 {
-    public function signup(Request $request): PersonalAccessToken
+    public function signup(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required',
+                'email' => 'required|email|unique:users',
+                'password' => 'required|min:6',
+            ]);
 
-        $user = User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => bcrypt($request->input('password')),
-        ]);
-
-        // Generating a token for the newly registered user
-        $tokenResult = $user->createToken('auth_token');
-
-        return $tokenResult;
+            $user = User::create([
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'password' => bcrypt($request->input('password')),
+            ]);
+            return response()->json($user, 201);
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            // Handle other exceptions (e.g., database errors) here
+            return response()->json(['error' => 'Something went wrong.', $e], 500);
+        }
     }
+
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
 
-        if (Auth::attempt($request->only('email', 'password'))) {
-            $token = $request->user()->createToken($request->token_name);
-            return ['token' => $token->plainTextToken];
+            if (Auth::attempt($request->only('email', 'password'))) {
+                $user = $request->user();
+                $token = $user->createToken('auth_token');
+
+                return response()->json([
+                    'token' => $token->plainTextToken,
+                    'user' => $user,
+                ]);
+            }
+
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
         }
-
-        throw ValidationException::withMessages([
-            'email' => ['The provided credentials are incorrect.'],
-        ]);
     }
 
     public function logout(Request $request)

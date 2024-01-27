@@ -13,9 +13,15 @@ import {
     QueryClient,
     QueryClientProvider,
 } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import "./index.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+
 import Landing from "./Pages/Main";
+import Authenticate from "./Pages/Authenticate";
+import Admin from "./Pages/Admin";
+import Events from "./Pages/Events";
 
 const App = () => {
     const location = useLocation();
@@ -27,6 +33,9 @@ const App = () => {
     return (
         <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/auth" element={<Authenticate />} />
         </Routes>
     );
 };
@@ -36,11 +45,12 @@ const root = createRoot(document.getElementById("root"));
 const queryClient = new QueryClient();
 
 root.render(
-    <QueryClientProvider client={queryClient}>
-        <React.StrictMode>
+    <React.StrictMode>
+        <QueryClientProvider client={queryClient}>
             <Router>
                 <App />
             </Router>
-        </React.StrictMode>
-    </QueryClientProvider>
+            <ReactQueryDevtools />
+        </QueryClientProvider>
+    </React.StrictMode>
 );

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EventsController;
+use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,21 +17,34 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// login
+// LOGGED IN ACTIONS
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/test', [UsersController::class, 'test']);
+
+    Route::prefix('/users')->group(function () {
+        Route::post('/', [UsersController::class, 'store']);
+        Route::put('/{id}', [UsersController::class, 'update']);
+        Route::delete('/{id}', [UsersController::class, 'destroy']);
+    });
+
+    Route::prefix('/events')->group(function () {
+        Route::post('/', [EventsController::class, 'store']);
+        Route::put('/{id}', [EventsController::class, 'update']);
+        Route::delete('/{id}', [EventsController::class, 'destroy']);
+    });
+});
+
+// GUEST ACTIONS
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'signup']);
 
-// api endpointus, ko var lietot, ja ir ielogojies
-// GANDRĪZ VISIEM ENDPOINTIEM VAJADZĒTU BŪT ŠEIT
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+Route::prefix('/users')->group(function () {
+    Route::get('/', [UsersController::class, 'index']);
+    Route::get('/{id}', [UsersController::class, 'show']);
+});
 
-    // USERS
-    Route::prefix('/users')->group(function () {
-        Route::get('/', [AuthController::class, 'index']);
-        Route::get('/{id}', [AuthController::class, 'show']);
-        Route::post('/', [AuthController::class, 'store']);
-        Route::put('/{id}', [AuthController::class, 'update']);
-        Route::delete('/{id}', [AuthController::class, 'destroy']);
-    });
+Route::prefix('/events')->group(function () {
+    Route::get('/', [EventsController::class, 'index']);
+    Route::get('/{id}', [EventsController::class, 'show']);
 });
