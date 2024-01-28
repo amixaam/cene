@@ -22,6 +22,8 @@ import Landing from "./Pages/Main";
 import Authenticate from "./Pages/Authenticate";
 import Admin from "./Pages/Admin";
 import Events from "./Pages/Events";
+import SuccessPayment from "./Pages/Payment/Success";
+import CancelPayment from "./Pages/Payment/Cancel";
 
 const App = () => {
     const location = useLocation();
@@ -36,14 +38,14 @@ const App = () => {
             <Route path="/events" element={<Events />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/auth" element={<Authenticate />} />
+            <Route path="/payment/success" element={<SuccessPayment />} />
+            <Route path="/payment/cancel" element={<CancelPayment />} />
         </Routes>
     );
 };
 
 const root = createRoot(document.getElementById("root"));
-
 const queryClient = new QueryClient();
-
 root.render(
     <React.StrictMode>
         <QueryClientProvider client={queryClient}>

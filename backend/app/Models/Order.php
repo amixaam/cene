@@ -12,8 +12,9 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'event_id',
+        'ticket_ids',
+        'session_id',
         'amount',
-        'currency',
         'status',
     ];
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventsController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [EventsController::class, 'store']);
         Route::put('/{id}', [EventsController::class, 'update']);
         Route::delete('/{id}', [EventsController::class, 'destroy']);
+    });
+
+    Route::prefix('/payments')->group(function () {
+        Route::post('/checkout', [StripeController::class, 'checkout']);
+        Route::post('/success', [StripeController::class, 'success']);
+        // Route::put('/{id}', [StripeController::class, 'update']);
+        // Route::delete('/{id}', [StripeController::class, 'destroy']);
     });
 });
 
