@@ -67,6 +67,7 @@ class StripeController extends Controller
     }
     public function checkout(Request $request)
     {
+        // return response()->json($request->all());
         try {
             $request->validate([
                 'event_id' => 'required|integer',
@@ -91,8 +92,8 @@ class StripeController extends Controller
         $session = \Stripe\Checkout\Session::create([
             'line_items' => $ticketData['line_items'],
             'mode' => 'payment',
-            'success_url' => $frontendURL . "payment/success" . "?session_id={CHECKOUT_SESSION_ID}",
-            'cancel_url' => $frontendURL . "payment/cancel",
+            'success_url' => $frontendURL . "success" . "?session_id={CHECKOUT_SESSION_ID}",
+            'cancel_url' => $frontendURL . "cancel",
         ]);
 
         $ticketIds = [];
@@ -117,33 +118,35 @@ class StripeController extends Controller
 
     public function success(Request $request)
     {
-        \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
-        $sessionId = $request->get('session_id');
-
         try {
-            $session = \Stripe\Checkout\Session::retrieve($sessionId);
+            $request->validate([
+                'session_id' => 'required|string',
+            ]);
 
-            if (!$session instanceof \Stripe\Checkout\Session) {
-                return response()->json(["error" => 'Invalid session'], 404);
-            }
-
-            $customer = \Stripe\Customer::retrieve($session->customer);
-            $order = Order::where('session_id', $session->id)->first();
+            $order = Order::where('session_id', $request->session_id)->first();
 
             if (!$order) {
-                return response()->json(["error" => 'Order not found'], 404);
+                return response()->json(["error" => 'Order not found']);
             }
 
-            if ($order->status === 'unpaid') {
-                $order->status = 'paid';
-                $order->save();
+            if ($order->status === 'paid') {
+                return response()->json(["error" => 'Order already paid']);
             }
 
-            return response()->json(["message" => compact('customer')]);
+            // Update specific fields based on your requirements
+            $order->update([
+                'status' => 'paid',
+            ]);
+
+            return response()->json(["success" => "success!"]);
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json(["error" => 'An error occurred'], 500);
+            return response()->json(["error" => 'An error occurred: ' . $e->getMessage()], 500);
         }
     }
+
+
 
 
     public function cancel()
@@ -152,44 +155,44 @@ class StripeController extends Controller
 
     public function webhook()
     {
-        // // This is your Stripe CLI webhook secret for testing your endpoint locally.
-        // $endpoint_secret = env('STRIPE_WEBHOOK_SECRET');
+        // This is your Stripe CLI webhook secret for testing your endpoint locally.
+        $endpoint_secret = env('STRIPE_WEBHOOK_SECRET');
 
-        // $payload = @file_get_contents('php://input');
-        // $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
-        // $event = null;
+        $payload = @file_get_contents('php://input');
+        $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
+        $event = null;
 
-        // try {
-        //     $event = \Stripe\Webhook::constructEvent(
-        //         $payload,
-        //         $sig_header,
-        //         $endpoint_secret
-        //     );
-        // } catch (\UnexpectedValueException $e) {
-        //     // Invalid payload
-        //     return response('', 400);
-        // } catch (\Stripe\Exception\SignatureVerificationException $e) {
-        //     // Invalid signature
-        //     return response('', 400);
-        // }
+        try {
+            $event = \Stripe\Webhook::constructEvent(
+                $payload,
+                $sig_header,
+                $endpoint_secret
+            );
+        } catch (\UnexpectedValueException $e) {
+            // Invalid payload
+            return response('', 400);
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+            // Invalid signature
+            return response('', 400);
+        }
 
-        // // Handle the event
-        // switch ($event->type) {
-        //     case 'checkout.session.completed':
-        //         $session = $event->data->object;
+        // Handle the event
+        switch ($event->type) {
+            case 'checkout.session.completed':
+                $session = $event->data->object;
 
-        //         $order = Order::where('session_id', $session->id)->first();
-        //         if ($order && $order->status === 'unpaid') {
-        //             $order->status = 'paid';
-        //             $order->save();
-        //             // Send email to customer
-        //         }
+                $order = Order::where('session_id', $session->id)->first();
+                if ($order && $order->status === 'unpaid') {
+                    $order->status = 'paid';
+                    $order->save();
+                    // Send email to customer
+                }
 
-        //         // ... handle other event types
-        //     default:
-        //         echo 'Received unknown event type ' . $event->type;
-        // }
+                // ... handle other event types
+            default:
+                echo 'Received unknown event type ' . $event->type;
+        }
 
-        // return response('');
+        return response('');
     }
 }

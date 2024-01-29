@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Roboto+Flex:opsz,wght@8..144,500;8..144,800&family=Roboto+Serif:opsz,wght@8..144,400;8..144,500&display=swap");
 
-:root[data-theme="light"] {
+:root {
+    --text: #ffeade;
     --text-50: #f6eeee;
     --text-100: #eedddd;
     --text-200: #ddbbbb;
@@ -13,6 +14,7 @@
     --text-900: #221111;
     --text-950: #110909;
 
+    --background: #ffeade;
     --background-50: #ffeee5;
     --background-100: #ffdecc;
     --background-200: #ffbd99;
@@ -62,7 +64,7 @@
     --accent-950: #170202;
 }
 
-:root[data-theme="dark"] {
+[data-theme="dark"] {
     --text-50: #110909;
     --text-100: #221111;
     --text-200: #442222;
@@ -129,4 +131,9 @@
     min-width: 0;
     box-sizing: border-box;
     font-family: "Roboto Serif", serif;
+}
+
+body {
+    color: var(--text-50);
+    background-color: var(--background-50);
 }

@@ -1,10 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
+import "./index.scss";
+
 import React from "react";
 import GetGenres from "../../Database/API/GetGenres";
 
 export default function Landing() {
+    sessionStorage.setItem(
+        "token",
+        "Bearer 2|SrhxbaK79vsVfC7RqqFGGi2w43H4lKU3allEf2PX4ba0bf78"
+    );
     // Using the hook
     const dataQuery = useQuery({
         queryKey: ["test"],
@@ -12,6 +18,7 @@ export default function Landing() {
     });
 
     const handlePurchaseRedirect = async () => {
+        const token = sessionStorage.getItem("token");
         const purchaseData = {
             event_id: 1,
             seats: [
@@ -19,14 +26,20 @@ export default function Landing() {
                 [4, 6],
             ],
         };
-        const urlEndpoint = "http://127.0.0.1:8000/payments/checkout";
+        const urlEndpoint = "http://127.0.0.1:8000/api/payments/checkout";
 
         try {
-            const response = await axios.post(urlEndpoint, purchaseData);
+            const response = await axios.post(urlEndpoint, purchaseData, {
+                headers: {
+                    Authorization: token,
+                    "Content-Type": "application/json", // Adjust content type as needed
+                },
+            });
             const checkoutUrl = response.data;
 
             // Redirect to the checkout URL
-            window.location.href = checkoutUrl;
+            console.log(checkoutUrl);
+            window.location.replace(checkoutUrl);
         } catch (error) {
             console.error("Error fetching checkout data:", error);
             // Handle the error, e.g., show an error message to the user

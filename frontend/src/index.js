@@ -6,41 +6,38 @@ import {
     useLocation,
 } from "react-router-dom";
 import { createRoot } from "react-dom/client";
-import {
-    useQuery,
-    useMutation,
-    useQueryClient,
-    QueryClient,
-    QueryClientProvider,
-} from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-import "./index.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useLocalStorage } from "@uidotdev/usehooks";
+
 import "bootstrap-icons/font/bootstrap-icons.css";
+import "./index.css";
 
 import Landing from "./Pages/Main";
 import Authenticate from "./Pages/Authenticate";
 import Admin from "./Pages/Admin";
 import Events from "./Pages/Events";
-import SuccessPayment from "./Pages/Payment/Success";
-import CancelPayment from "./Pages/Payment/Cancel";
+import SuccessPayment from "./Pages/Payment";
 
 const App = () => {
     const location = useLocation();
+    const [theme, setTheme] = useLocalStorage("theme" ? "dark" : "light");
 
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [location.pathname]);
 
     return (
-        <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/auth" element={<Authenticate />} />
-            <Route path="/payment/success" element={<SuccessPayment />} />
-            <Route path="/payment/cancel" element={<CancelPayment />} />
-        </Routes>
+        <div data-theme={theme}>
+            <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/auth" element={<Authenticate />} />
+                <Route path="/success" element={<SuccessPayment />} />
+            </Routes>
+        </div>
     );
 };
 
