@@ -1,0 +1,74 @@
+.event-card-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 15px;
+    background: var(--background-950);
+
+    width: 19rem;
+
+    max-height: 100%;
+    align-self: stretch;
+    flex: 0 0 auto;
+
+    cursor: pointer;
+
+    .card-image {
+        width: 100%;
+        height: 20rem;
+        border-radius: 15px 15px 0px 0px;
+    }
+
+    .image-container {
+        position: relative;
+        width: 100%;
+        height: 20rem;
+        border-radius: 15px 15px 0px 0px;
+        overflow: hidden; /* Ensure the gradient overlay stays within the container */
+    }
+
+    .card-content {
+        display: flex;
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        align-self: stretch;
+
+        p {
+            color: var(--background-50);
+            font-family: "Roboto Serif";
+            font-size: 0.9rem;
+            font-weight: 400;
+            align-self: stretch;
+            opacity: 0.8;
+            line-height: 19px;
+        }
+    }
+
+    .title-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+
+        h3,
+        p {
+            font-family: "Roboto Flex";
+            color: var(--background);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            line-height: 100%;
+            letter-spacing: 0.125rem;
+        }
+
+        p {
+            font-size: 0.75rem;
+            font-weight: 400;
+            opacity: 0.45;
+        }
+    }
+}

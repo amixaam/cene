@@ -56,3 +56,8 @@ Route::prefix('/events')->group(function () {
     Route::get('/', [EventsController::class, 'index']);
     Route::get('/{id}', [EventsController::class, 'show']);
 });
+
+Route::prefix('/reviews')->group(function () {
+    // Route::get('/', [EventsController::class, 'index']);
+    Route::get('/random', [EventsController::class, 'getRandomReview']);
+});

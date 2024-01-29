@@ -19,10 +19,11 @@ import Authenticate from "./Pages/Authenticate";
 import Admin from "./Pages/Admin";
 import Events from "./Pages/Events";
 import SuccessPayment from "./Pages/Payment";
+import Event from "./Pages/Event";
 
 const App = () => {
     const location = useLocation();
-    const [theme, setTheme] = useLocalStorage("theme" ? "dark" : "light");
+    const [theme, setTheme] = useLocalStorage("theme" ? "light" : "dark");
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -33,6 +34,7 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/events" element={<Events />} />
+                <Route path="/event" element={<Event />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/auth" element={<Authenticate />} />
                 <Route path="/success" element={<SuccessPayment />} />

@@ -1,10 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
+import React from "react";
 import axios from "axios";
 
-import "./index.scss";
+import "../../CSS/Main.scss";
+import HeroImage from "../../Images/Images/Hero.svg";
 
-import React from "react";
-import GetGenres from "../../Database/API/GetGenres";
+import GetEvents from "../../Database/API/GetEvents";
+import GetRandomReview from "../../Database/API/GetRandomReview";
+
+import EventCard from "../../Reuse/Components/EventCard";
+import ReviewCard from "../../Reuse/Components/ReviewCard";
 
 export default function Landing() {
     sessionStorage.setItem(
@@ -12,9 +17,22 @@ export default function Landing() {
         "Bearer 2|SrhxbaK79vsVfC7RqqFGGi2w43H4lKU3allEf2PX4ba0bf78"
     );
     // Using the hook
-    const dataQuery = useQuery({
-        queryKey: ["test"],
-        queryFn: GetGenres,
+    const {
+        data: eventData,
+        error: eventError,
+        isLoading: eventisLoading,
+    } = useQuery({
+        queryKey: ["events"],
+        queryFn: GetEvents,
+    });
+
+    const {
+        data: reviewData,
+        error: reviewError,
+        isLoading: reviewisLoading,
+    } = useQuery({
+        queryKey: ["reviews"],
+        queryFn: GetRandomReview,
     });
 
     const handlePurchaseRedirect = async () => {
@@ -46,32 +64,61 @@ export default function Landing() {
         }
     };
 
+    const handleEventRedirect = (event_id) => {
+        window.location.href = `/event?e=${event_id}`;
+    };
+
     // Error and Loading states
-    if (dataQuery.isError) return <pre>{JSON.stringify(dataQuery.error)}</pre>;
-    if (dataQuery.isLoading) return <div>Loading...</div>;
+    if (eventError) return <pre>{JSON.stringify(eventData.error)}</pre>;
+    if (reviewError) return <pre>{JSON.stringify(reviewError.error)}</pre>;
 
     return (
-        <div>
-            <i className="bi bi-sun-fill large-icon"></i>
-            <i className="bi bi-moon-stars-fill"></i>
-
-            <h1>Landing</h1>
-            <button onClick={handlePurchaseRedirect}>
-                Buy seats for Resident Castle II
-            </button>
-
-            {dataQuery.data.map((item) => (
-                <div key={item.id}>
-                    <img src={item.file_path} alt={item.name} />
-                    <h1>{item.name}</h1>
-                    <p>{item.description}</p>
-                    <p>
-                        {item.date}
-                        <br />
-                        {item.time}
-                    </p>
+        <div className="page-wrapper">
+            <header className="hero-wrapper">
+                <img src={HeroImage} alt="" />
+                <div className="side-margins hero-content">
+                    <div className="title-content">
+                        <h1>CENE</h1>
+                        <p>The one-stop-shop for tickets in Latvia.</p>
+                    </div>
                 </div>
-            ))}
+            </header>
+            <main className="main-content-wrapper side-margins">
+                <section className="upcoming-events-wrapper">
+                    <h2>Upcoming Events</h2>
+                    <div className="events-wrapper">
+                        {eventisLoading ? (
+                            <div className="error">Loading...</div>
+                        ) : (
+                            eventData.map((item) => (
+                                <EventCard
+                                    data={item}
+                                    handleEventRedirect={handleEventRedirect}
+                                    key={item.id}
+                                />
+                            ))
+                        )}
+                    </div>
+                    <div className="button-wrapper">
+                        <button className="flex-button">View All Events</button>
+                    </div>
+                </section>
+                <section className="review-wrapper">
+                    {reviewisLoading ? (
+                        <div className="error">Loading...</div>
+                    ) : (
+                        <>
+                            <h2>A review from {reviewData.event.name}</h2>
+                            <ReviewCard data={reviewData} />
+                            <div className="button-wrapper">
+                                <button className="flex-button">
+                                    More Reviews
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </section>
+            </main>
         </div>
     );
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Review;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -12,6 +13,23 @@ class EventsController extends Controller
     public function index()
     {
         return response()->json(Event::all());
+    }
+
+    public function show($eventId)
+    {
+        $event = Event::find($eventId);
+
+        if (!$event) {
+            return response()->json(['error' => 'Event not found'], 404);
+        }
+
+        return response()->json($event);
+    }
+
+    public function getRandomReview()
+    {
+        $review = Review::with('event')->inRandomOrder()->first();
+        return response()->json($review);
     }
 
     public function store(Request $request)

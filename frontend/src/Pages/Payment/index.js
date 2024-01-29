@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { json, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import ConfirmPayment from "../../Database/API/ConfirmPayment";
 
 export default function SuccessPayment() {

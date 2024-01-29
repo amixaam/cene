@@ -1,0 +1,120 @@
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    background-color: var(--background);
+}
+
+.hero-wrapper {
+    height: 70vh;
+    width: 100%;
+
+    img {
+        width: 100%;
+        position: absolute;
+        z-index: 1;
+    }
+
+    .hero-content {
+        height: 89%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        .title-content {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            width: fit-content;
+        }
+        h1,
+        p {
+            color: #ffeade;
+            text-shadow: 0px 4px 100px rgba(0, 0, 0, 0.9);
+            z-index: 2;
+        }
+
+        h1 {
+            font-family: "Playfair Display";
+            font-size: 12.75rem;
+            font-weight: 700;
+            line-height: 95%;
+        }
+
+        p {
+            text-align: center;
+            font-family: "Roboto Serif";
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+    }
+}
+
+.side-margins {
+    width: 83vw;
+    margin: auto;
+}
+
+// main
+h2 {
+    color: var(--text-950, #221010);
+    text-align: start;
+    font-family: "Roboto Flex";
+    font-size: 3.3rem;
+    font-weight: 800;
+}
+
+.flex-button {
+    display: flex;
+    padding: 0.75rem 1.25rem;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    border: 3px solid rgba(0, 0, 0, 0.8);
+    background-color: var(--background-950, #221010);
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.2);
+    color: var(--background, #ffeade);
+    text-align: center;
+    font-family: "Roboto Flex";
+    font-size: 1.25rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.main-content-wrapper {
+    display: flex;
+    padding: 7rem 0rem;
+    gap: 7rem;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.upcoming-events-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 100%;
+
+    .events-wrapper {
+        max-width: 100%;
+
+        display: flex;
+        align-items: flex-start;
+        gap: 1.5rem;
+
+        overflow-x: auto;
+    }
+}
+.button-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.review-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 100%;
+}

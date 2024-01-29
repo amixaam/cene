@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export default async function GetGenres() {
+export default async function GetEvents() {
     const headers = {
         Accept: "application/json",
         Authorization:
