@@ -34,7 +34,7 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/events" element={<Events />} />
-                <Route path="/event" element={<Event />} />
+                <Route path="/event/:e" element={<Event />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/auth" element={<Authenticate />} />
                 <Route path="/success" element={<SuccessPayment />} />

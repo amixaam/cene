@@ -1,13 +1,11 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import GetEvents from "../../Database/API/GetEvents";
 import EventCard from "../../Reuse/Components/EventCard";
 
 export default function Event() {
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-    const event_id = searchParams.get("e");
+    const { e: event_id } = useParams();
 
     const { data, error, isLoading } = useQuery({
         queryKey: ["payment", "success", event_id],

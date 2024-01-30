@@ -118,6 +118,14 @@ export default function Landing() {
                         </>
                     )}
                 </section>
+                <section className="call-to-action-wrapper">
+                    <img src="" alt="" className="background" />
+                    <div className="content-wrapper">
+                        <h1>MOMENTS</h1>
+                        <p>That you're gonna enjoy.</p>
+                        <button className="flex-button-white">Sign up</button>
+                    </div>
+                </section>
             </main>
         </div>
     );

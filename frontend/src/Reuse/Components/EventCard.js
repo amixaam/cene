@@ -2,6 +2,8 @@ import React from "react";
 
 import "../../CSS/EventCard.scss";
 
+import { Link } from "react-router-dom";
+
 export default function EventCard({ data, handleEventRedirect }) {
     const startTime = new Date(`01/01/2022 ${data.time}`);
     const endTime = new Date(startTime.getTime() + data.length * 60000);
@@ -25,12 +27,7 @@ export default function EventCard({ data, handleEventRedirect }) {
     // Combine formatted times into a new variable
     const formattedRange = `${formattedStartTime} - ${formattedEndTime}`;
     return (
-        <div
-            className="event-card-wrapper"
-            onClick={() => {
-                handleEventRedirect(data.id);
-            }}
-        >
+        <Link className="event-card-wrapper" to={`/event/${data.id}`}>
             <div
                 className="card-image"
                 style={{
@@ -50,6 +47,6 @@ export default function EventCard({ data, handleEventRedirect }) {
                 </div>
                 <p>{truncatedDescription}</p>
             </div>
-        </div>
+        </Link>
     );
 }
