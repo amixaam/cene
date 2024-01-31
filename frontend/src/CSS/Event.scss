@@ -1,0 +1,37 @@
+.type-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+
+    .type {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        background-color: var(--background-100);
+        border-radius: 50px;
+        gap: 0.5rem;
+
+        .square {
+            height: 1rem;
+            aspect-ratio: 1;
+            border-radius: 50px;
+        }
+
+        .type-1 {
+            background-color: #c7e38c;
+        }
+        .type-2 {
+            background-color: #ffbe99;
+        }
+        .type-3 {
+            background-color: #a19ad0;
+        }
+        .type-4 {
+            background-color: #ffaad8;
+        }
+        .type-5 {
+            background-color: #afa199;
+        }
+    }
+}

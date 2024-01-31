@@ -79,7 +79,7 @@ class EventsController extends Controller
             }
         }
 
-        return response()->json(['event' => $event, 'ratingAVG' => $ratingAVG, 'seats' => $seatsData, 'freeSeats' => $freeSeats]);
+        return response()->json(['event' => $event, 'ratingAVG' => $ratingAVG, 'seats' => $seatsData, 'freeSeats' => $freeSeats, 'ticketTypes' => $ticketTypes]);
     }
 
     public function getRandomReview()
