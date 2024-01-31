@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 import "../../CSS/Main.scss";
 import HeroImage from "../../Images/Images/Hero.svg";
@@ -12,10 +13,6 @@ import EventCard from "../../Reuse/Components/EventCard";
 import ReviewCard from "../../Reuse/Components/ReviewCard";
 
 export default function Landing() {
-    sessionStorage.setItem(
-        "token",
-        "Bearer 2|SrhxbaK79vsVfC7RqqFGGi2w43H4lKU3allEf2PX4ba0bf78"
-    );
     // Using the hook
     const {
         data: eventData,
@@ -100,7 +97,9 @@ export default function Landing() {
                         )}
                     </div>
                     <div className="button-wrapper">
-                        <button className="flex-button">View All Events</button>
+                        <Link className="flex-button" to="events">
+                            View All Events
+                        </Link>
                     </div>
                 </section>
                 <section className="review-wrapper">
@@ -111,9 +110,12 @@ export default function Landing() {
                             <h2>A review from {reviewData.event.name}</h2>
                             <ReviewCard data={reviewData} />
                             <div className="button-wrapper">
-                                <button className="flex-button">
+                                <Link
+                                    className="flex-button"
+                                    to={`event/${reviewData.event.id}`}
+                                >
                                     More Reviews
-                                </button>
+                                </Link>
                             </div>
                         </>
                     )}

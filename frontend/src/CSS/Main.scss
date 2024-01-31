@@ -37,7 +37,7 @@
 
         h1 {
             font-family: "Playfair Display";
-            font-size: 12.75rem;
+            font-size: clamp(2rem, calc(15vw + 1rem), 12.75rem);
             font-weight: 700;
             line-height: 95%;
         }
@@ -46,14 +46,10 @@
             text-align: center;
             font-family: "Roboto Serif";
             font-size: 1.5rem;
+            font-size: clamp(0.5rem, calc(15vw + 1rem), 1.5rem);
             font-weight: 400;
         }
     }
-}
-
-.side-margins {
-    width: 83vw;
-    margin: auto;
 }
 
 // main
@@ -63,23 +59,6 @@ h2 {
     font-family: "Roboto Flex";
     font-size: 3.3rem;
     font-weight: 800;
-}
-
-.flex-button {
-    display: flex;
-    padding: 0.75rem 1.25rem;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10px;
-    border: 3px solid rgba(0, 0, 0, 0.8);
-    background-color: var(--background-950, #221010);
-    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.2);
-    color: var(--background, #ffeade);
-    text-align: center;
-    font-family: "Roboto Flex";
-    font-size: 1.25rem;
-    font-weight: 800;
-    cursor: pointer;
 }
 
 .main-content-wrapper {

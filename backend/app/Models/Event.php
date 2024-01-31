@@ -30,4 +30,9 @@ class Event extends Model
     {
         return $this->belongsTo(AgeRating::class);
     }
+
+    public function ticketTypes()
+    {
+        return $this->hasMany(TicketType::class);
+    }
 }

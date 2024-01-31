@@ -136,3 +136,311 @@
 body {
     background-color: var(--background);
 }
+
+.side-margins {
+    width: min(65rem, 100%);
+    margin: auto;
+    /* border: 2px red solid; */
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+}
+
+.scrolled {
+    backdrop-filter: blur(10px);
+    border-bottom: rgba(0, 0, 0, 0.2) 2px solid;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+nav {
+    width: 100%;
+    position: fixed;
+    z-index: 5;
+    transition: 500ms ease;
+    border-bottom: rgba(0, 0, 0, 0) 2px solid;
+
+    .content-wrapper {
+        padding: 0.5rem 0rem;
+        display: flex;
+        justify-content: space-between;
+        flex-shrink: 0;
+    }
+
+    a {
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .logo {
+        color: var(--background, #ffeade);
+        text-shadow: 0px 0px 70px rgba(0, 0, 0, 1);
+        font-family: "Playfair Display";
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 100%; /* 64px */
+    }
+    .regular {
+        color: var(--background, #ffeade);
+        text-shadow: 0px 0px 30px rgba(0, 0, 0, 0.9);
+        font-family: "Roboto Serif";
+        font-size: 1.25rem;
+        font-weight: 300;
+        line-height: 100%; /* 36px */
+        background-color: transparent;
+        border: none;
+    }
+
+    .view-links-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 6rem;
+        flex-shrink: 0;
+        align-self: stretch;
+    }
+
+    .user-links-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 2rem;
+        flex: 1 0 0;
+        align-self: stretch;
+    }
+}
+
+.flex-button-white {
+    display: flex;
+    padding: 0.25rem 1rem;
+    justify-content: center;
+    align-items: center;
+
+    color: #fff;
+    text-align: center;
+    font-family: "Roboto Serif";
+    font-size: 1.25rem;
+    font-weight: 600;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0px 0px 40px 0px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+.flex-button {
+    display: flex;
+    padding: 0.75rem 1.25rem;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    border: 3px solid rgba(0, 0, 0, 0.8);
+    background-color: var(--background-950, #221010);
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.2);
+    color: var(--background, #ffeade);
+    text-align: center;
+    font-family: "Roboto Flex";
+    font-size: 1.25rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+button {
+    cursor: pointer;
+}
+
+.flex-input {
+    border-radius: 8px;
+    border: 2.5px var(--background-300) solid;
+    background-color: var(--background-100);
+    color: var(--text-950);
+
+    padding: 0.4rem 0.25rem;
+    font-size: 1rem;
+    width: 20rem;
+
+    transition: 200ms ease;
+}
+.flex-input:focus {
+    outline: none;
+    border-color: var(--background-500);
+}
+
+/* modals */
+
+.login-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.2);
+
+    z-index: 9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-modal-content {
+    overflow: auto;
+    outline: none;
+    -webkit-overflow-scrolling: touch;
+
+    border: 3px solid var(--background-100);
+    background: var(--background);
+    border-radius: 10px;
+    padding: 3rem 2rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+
+    p {
+        font-size: 1rem;
+        font-weight: 500;
+        line-height: 129.167%;
+        letter-spacing: 0.075rem;
+    }
+
+    .form-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .flex-button {
+        width: 100%;
+
+        i {
+            font-size: 24px;
+            animation: rotate 2s ease infinite;
+        }
+    }
+
+    .info-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        align-self: stretch;
+
+        p {
+            font-size: 0.75rem;
+        }
+    }
+
+    .options-text {
+        display: flex;
+        flex-direction: row;
+        gap: 1ch;
+        p:nth-child(2) {
+            text-decoration: underline;
+            color: var(--background-300);
+            cursor: pointer;
+        }
+    }
+}
+
+.ReactModal__Overlay {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ReactModal__Overlay--after-open {
+    opacity: 1;
+}
+
+.ReactModal__Overlay--before-close {
+    opacity: 0;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+footer {
+    width: 100%;
+    background-color: var(--background-200);
+    padding: 6rem 0rem;
+    justify-content: center;
+
+    h3 {
+        color: #cc4b00;
+        text-align: center;
+        font-family: "Roboto Flex";
+        font-size: 2rem;
+        font-weight: 800;
+    }
+    p,
+    a {
+        color: #662500;
+        text-align: center;
+        font-family: "Roboto Serif";
+        font-size: 1rem;
+        font-weight: 500;
+        text-decoration: none;
+
+        i {
+            font-size: 24px;
+        }
+        img {
+            height: 24px;
+            aspect-ratio: 1;
+        }
+    }
+    .footer-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .info-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+
+        .programs-text {
+            width: 100%;
+            text-align: center;
+        }
+        .text-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: self-start;
+            gap: 0.25rem;
+            text-align: center;
+        }
+    }
+
+    .icon-wrapper {
+        display: flex;
+        flex-direction: row;
+        gap: 0.25rem;
+        width: 100%;
+    }
+
+    .credits-wrapper {
+        display: flex;
+        flex-direction: row;
+        gap: 0.25rem;
+        width: 100%;
+        justify-content: flex-end;
+    }
+    .text-chunk {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+    }
+}

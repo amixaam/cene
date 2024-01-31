@@ -10,8 +10,7 @@ export default async function ConfirmPayment(session) {
     return axios.post("http://127.0.0.1:8000/api/payments/success", body, {
         headers: {
             Accept: "application/json",
-            Authorization:
-                "Bearer 1|GatRsKm5Z5xbJyusAFC44K3mPffk0b4xCy4fgXKJecfca1e1",
+            Authorization: token,
         },
     });
 }

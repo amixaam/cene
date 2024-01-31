@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\TicketType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,8 +22,9 @@ return new class extends Migration
             $table->string("file_path");
             $table->integer('length');
             $table->foreignId('age_rating_id')->nullable()->constrained();
-            $table->decimal('regular_ticket_price');
-            $table->decimal('vip_ticket_price');
+            $table->integer('max_rows')->default(5);
+            $table->integer('max_cols')->default(12);
+
             $table->timestamps();
         });
     }

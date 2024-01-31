@@ -4,20 +4,9 @@ import "../../CSS/EventCard.scss";
 
 import { Link } from "react-router-dom";
 
+import ConvertTime from "./ConvertTime";
+
 export default function EventCard({ data, handleEventRedirect }) {
-    const startTime = new Date(`01/01/2022 ${data.time}`);
-    const endTime = new Date(startTime.getTime() + data.length * 60000);
-
-    // Format start and end times
-    const formattedStartTime = startTime.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-    });
-    const formattedEndTime = endTime.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-    });
-
     const maxLength = 120;
     const truncatedDescription =
         data.description.length > maxLength
@@ -25,6 +14,10 @@ export default function EventCard({ data, handleEventRedirect }) {
             : data.description;
 
     // Combine formatted times into a new variable
+    const { formattedStartTime, formattedEndTime } = ConvertTime(
+        data.time,
+        data.length
+    );
     const formattedRange = `${formattedStartTime} - ${formattedEndTime}`;
     return (
         <Link className="event-card-wrapper" to={`/event/${data.id}`}>

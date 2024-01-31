@@ -1,4 +1,6 @@
 const StarsRating = ({ rating }) => {
+    if (!rating) return "No rating";
+
     const filledStars = Array.from(
         { length: Math.floor(rating) },
         (_, index) => <i className="bi bi-star-fill" key={index}></i>

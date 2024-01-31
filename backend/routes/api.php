@@ -45,7 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // GUEST ACTIONS
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'signup']);
+Route::post('/signup', [AuthController::class, 'signup']);
 
 Route::prefix('/users')->group(function () {
     Route::get('/', [UsersController::class, 'index']);
@@ -58,6 +58,5 @@ Route::prefix('/events')->group(function () {
 });
 
 Route::prefix('/reviews')->group(function () {
-    // Route::get('/', [EventsController::class, 'index']);
     Route::get('/random', [EventsController::class, 'getRandomReview']);
 });
