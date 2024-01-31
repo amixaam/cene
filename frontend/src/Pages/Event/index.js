@@ -1,6 +1,8 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 import GetEventByID from "../../Database/API/GetEventByID";
 
 import ConvertTime from "../../Reuse/Components/ConvertTime";
@@ -34,51 +36,70 @@ export default function Event({ handleLoginPopup }) {
     return (
         <div className="event-view-wrapper">
             <img src={data["event"].file_path} alt="" />
-            <div className="info-wrapper">
-                <div className="title-payment-wrapper">
-                    <div className="title">
-                        <h2>{data["event"].name}</h2>
-                        <StarsRating rating={data["ratingAVG"]} />
-                    </div>
-                    <div className="payment">
-                        <p>n seats available</p>
-                        <button className="flex-button">
-                            From {lowestPrice} €
-                        </button>
-                    </div>
-                </div>
-                <div className="statistics-wrapper">
-                    <p>Genre: {data["event"].genre.name}</p>
-                    <p>
-                        {data["event"].date} {formattedRange}
-                    </p>
-                    <p>Age rating: {data["event"].age_rating.name}</p>
-                </div>
-                <div className="description-wrapper">
-                    {data["event"].description}
-                </div>
-            </div>
-            <div className="seat-wrapper">
-                <h2>Seat information</h2>
-                <div className="type-wrapper">
-                    <div className="type">
-                        <div className={`square type-5`}></div>
-                        <p>Taken</p>
-                    </div>
-                    {data.ticketTypes.map((type) => (
-                        <div key={type.id} className="type">
-                            <div className={`square type-${type.id}`}></div>
-                            <p>{type.name}</p>
-                            <p>{type.price} €</p>
+            <div className="content-wrapper side-margins">
+                <div className="info-wrapper">
+                    <div className="title-payment-wrapper">
+                        <div className="title">
+                            <h2>{data["event"].name}</h2>
+                            <StarsRating rating={data["ratingAVG"]} />
                         </div>
-                    ))}
+                        <div className="payment">
+                            <p>{data.freeSeats} seats available</p>
+                            {sessionStorage.getItem("token") ? (
+                                <Link
+                                    to={`/Pay/${data["event"].id}`}
+                                    className="flex-button"
+                                >
+                                    From {lowestPrice} €
+                                </Link>
+                            ) : (
+                                <button
+                                    className="flex-button"
+                                    onClick={handleLoginPopup}
+                                >
+                                    Log in to buy
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    <div className="statistics-wrapper">
+                        <p>Genre: {data["event"].genre.name}</p>
+                        <div className="divider"></div>
+                        <p>
+                            {data["event"].date} • {formattedRange}
+                        </p>
+                        <div className="divider"></div>
+                        <p>Age rating: {data["event"].age_rating.name}</p>
+                    </div>
+                    <div className="description-wrapper">
+                        {data["event"].description}
+                    </div>
                 </div>
-                <SeatingChart
-                    seatsData={data.seats}
-                    maxCols={data.event.max_cols}
-                    ticketTypes={data.ticketTypes}
-                    DisplayOnly={true}
-                />
+                <div className="seat-wrapper">
+                    <h2>Seat information</h2>
+                    <div className="type-wrapper">
+                        <div className="type">
+                            <div className={`square type-5`}></div>
+                            <p>Taken</p>
+                        </div>
+                        {data.ticketTypes.map((type) => (
+                            <div key={type.id} className="type">
+                                <div className={`square type-${type.id}`}></div>
+                                <p>{type.name}</p>
+                                <p>{type.price} €</p>
+                            </div>
+                        ))}
+                    </div>
+                    <SeatingChart
+                        seatsData={data.seats}
+                        maxCols={data.event.max_cols}
+                        ticketTypes={data.ticketTypes}
+                        DisplayOnly={true}
+                    />
+                </div>
+                <div className="review-wrapper">
+                    <h2>Reviews</h2>
+                </div>
             </div>
         </div>
     );

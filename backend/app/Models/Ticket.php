@@ -11,7 +11,7 @@ class Ticket extends Model
         'event_id',
         'row_num',
         'col_num',
-        'type',
+        'ticket_types_id',
         'price',
         'redeemed',
     ];

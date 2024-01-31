@@ -12,17 +12,16 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class StripeController extends Controller
 {
-    protected function createTickets($seats, $event_id)
+    protected function createTickets($seats, $event_id, $totalPrice)
     {
         $tickets = [];
         $lineItems = [];
-        $totalPrice = 0;
 
         // seat range [0,0] - [5,12]
         foreach ($seats as $key => $value) {
             $ticket = Ticket::where('event_id', $event_id)
-                ->where('row_num', $value[0])
-                ->where('col_num', $value[1])
+                ->where('row_num', $value['row'])
+                ->where('col_num', $value['col'])
                 ->first();
 
             if ($ticket) {
@@ -32,32 +31,21 @@ class StripeController extends Controller
             $event = Event::where('id', $event_id)
                 ->first();
 
-            $vipSeat = VipSeat::where('event_id', $event_id)
-                ->where('row_num', $value[0])
-                ->where('col_num', $value[1])
-                ->first();
-
-            $isVIP = false;
-            if ($vipSeat) $isVIP = true;
-
-            $price = $isVIP ? $event->vip_ticket_price : $event->regular_ticket_price;
-            $totalPrice += $price;
-
             $tickets[] = [
                 'event_id' => $event_id,
-                'row_num' => $value[0],
-                'col_num' => $value[1],
-                'type' => $isVIP ? "vip" : "regular",
-                'price' => $price,
+                'row_num' => $value['row'],
+                'col_num' => $value['col'],
+                'ticket_types_id' => $value['ticketTypeId'],
+                'price' => $value['price'],
                 'redeemed' => false,
             ];
             $lineItems[] = [
                 'price_data' => [
                     'currency' => 'eur',
                     'product_data' => [
-                        'name' => $event->name . " ticket for seat " . $value[1] . " on row " . $value[0],
+                        'name' => $event->name . " ticket for seat " . $value['col'] . " on row " . $value['row'],
                     ],
-                    'unit_amount' => $price * 100
+                    'unit_amount' => $value['price'] * 100
                 ],
                 'quantity' => 1,
             ];
@@ -78,7 +66,7 @@ class StripeController extends Controller
         }
 
         //Returns ticket data
-        $ticketData = $this->createTickets($request->get('seats'), $request->get('event_id'));
+        $ticketData = $this->createTickets($request->get('seats'), $request->get('event_id'), $request->get('total_price'));
         if (array_key_exists('errors', $ticketData)) {
             return response()->json(['errors' => $ticketData['errors']], 422);
         }
@@ -125,6 +113,8 @@ class StripeController extends Controller
 
             $order = Order::where('session_id', $request->session_id)->first();
 
+            // TODO: check if user_id from auth == order user_id
+
             if (!$order) {
                 return response()->json(["error" => 'Order not found']);
             }
@@ -146,11 +136,9 @@ class StripeController extends Controller
         }
     }
 
-
-
-
     public function cancel()
     {
+        // TODO: Remove Order and ticket entries  
     }
 
     public function webhook()

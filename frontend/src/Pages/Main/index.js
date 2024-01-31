@@ -32,35 +32,6 @@ export default function Landing() {
         queryFn: GetRandomReview,
     });
 
-    const handlePurchaseRedirect = async () => {
-        const token = sessionStorage.getItem("token");
-        const purchaseData = {
-            event_id: 1,
-            seats: [
-                [1, 2],
-                [4, 6],
-            ],
-        };
-        const urlEndpoint = "http://127.0.0.1:8000/api/payments/checkout";
-
-        try {
-            const response = await axios.post(urlEndpoint, purchaseData, {
-                headers: {
-                    Authorization: token,
-                    "Content-Type": "application/json", // Adjust content type as needed
-                },
-            });
-            const checkoutUrl = response.data;
-
-            // Redirect to the checkout URL
-            console.log(checkoutUrl);
-            window.location.replace(checkoutUrl);
-        } catch (error) {
-            console.error("Error fetching checkout data:", error);
-            // Handle the error, e.g., show an error message to the user
-        }
-    };
-
     const handleEventRedirect = (event_id) => {
         window.location.href = `/event?e=${event_id}`;
     };

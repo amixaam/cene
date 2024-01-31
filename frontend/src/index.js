@@ -28,6 +28,8 @@ import Event from "./Pages/Event";
 
 import Signup from "./Database/API/Signup";
 import Login from "./Database/API/Login";
+import Pay from "./Pages/Pay";
+import Cancel from "./Pages/Cancel";
 
 const App = () => {
     const location = useLocation();
@@ -303,9 +305,15 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/events" element={<Events />} />
-                <Route path="/event/:e" element={<Event />} />
+                <Route
+                    path="/event/:e"
+                    element={<Event handleLoginPopup={toggleLoginOpen} />}
+                />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/success" element={<SuccessPayment />} />
+                <Route path="/cancel" element={<Cancel />} />
+
+                <Route path="/pay/:e" element={<Pay />} />
             </Routes>
             <footer>
                 <div className="footer-wrapper side-margins">

@@ -7,9 +7,9 @@ const SeatingChart = ({
     maxCols,
     ticketTypes,
     DisplayOnly = false,
+    setSelectedSeats,
+    selectedSeats = [],
 }) => {
-    const [selectedSeats, setSelectedSeats] = useState([]);
-
     const getTicketTypeIdByName = (name) => {
         const index = ticketTypes.findIndex((type) => type.name === name);
         return index !== -1 ? index : null;
