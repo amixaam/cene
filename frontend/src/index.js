@@ -30,6 +30,8 @@ import Signup from "./Database/API/Signup";
 import Login from "./Database/API/Login";
 import Pay from "./Pages/Pay";
 import Cancel from "./Pages/Cancel";
+import Profile from "./Pages/Profile";
+import Edit from "./Pages/Edit";
 
 const App = () => {
     const location = useLocation();
@@ -114,6 +116,7 @@ const App = () => {
                     sessionStorage.setItem("role", res.data.user.role);
                     setLoginPopup(false);
                 } catch {
+                    setIsLoginButtonLoading(false);
                     setFormError((prevFormError) => ({
                         ...prevFormError,
                         name: "Server error",
@@ -128,12 +131,15 @@ const App = () => {
                     sessionStorage.setItem("role", res.data.user.role);
                     setLoginPopup(false);
                 } catch {
+                    setIsLoginButtonLoading(false);
                     setFormError((prevFormError) => ({
                         ...prevFormError,
                         email: "Incorrect credentials",
                     }));
                 }
             }
+        } else {
+            setIsLoginButtonLoading(false);
         }
     };
 
@@ -269,14 +275,25 @@ const App = () => {
                             Events
                         </Link>
                         {sessionStorage.getItem("role") && (
-                            <Link className="regular">Admin</Link>
+                            <Link className="regular" to="admin">
+                                Admin
+                            </Link>
                         )}
                     </div>
                     <div className="user-links-wrapper">
                         {sessionStorage.getItem("token") ? (
-                            <button className="regular" onClick={handleLogout}>
-                                Log out
-                            </button>
+                            <>
+                                <button
+                                    className="regular"
+                                    onClick={handleLogout}
+                                >
+                                    Log out
+                                </button>
+                                <Link
+                                    className="user-circle"
+                                    to="profile"
+                                ></Link>
+                            </>
                         ) : (
                             <>
                                 <button
@@ -310,10 +327,15 @@ const App = () => {
                     element={<Event handleLoginPopup={toggleLoginOpen} />}
                 />
                 <Route path="/admin" element={<Admin />} />
+                <Route
+                    path="/profile"
+                    element={<Profile handleLogout={handleLogout} />}
+                />
+
                 <Route path="/success" element={<SuccessPayment />} />
                 <Route path="/cancel" element={<Cancel />} />
-
                 <Route path="/pay/:e" element={<Pay />} />
+                <Route path="/admin/edit" element={<Edit />} />
             </Routes>
             <footer>
                 <div className="footer-wrapper side-margins">

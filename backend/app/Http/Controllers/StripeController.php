@@ -81,7 +81,7 @@ class StripeController extends Controller
             'line_items' => $ticketData['line_items'],
             'mode' => 'payment',
             'success_url' => $frontendURL . "success" . "?session_id={CHECKOUT_SESSION_ID}",
-            'cancel_url' => $frontendURL . "cancel",
+            'cancel_url' => $frontendURL . "cancel" . "?session_id={CHECKOUT_SESSION_ID}",
         ]);
 
         $ticketIds = [];
@@ -113,8 +113,6 @@ class StripeController extends Controller
 
             $order = Order::where('session_id', $request->session_id)->first();
 
-            // TODO: check if user_id from auth == order user_id
-
             if (!$order) {
                 return response()->json(["error" => 'Order not found']);
             }
@@ -123,7 +121,6 @@ class StripeController extends Controller
                 return response()->json(["error" => 'Order already paid']);
             }
 
-            // Update specific fields based on your requirements
             $order->update([
                 'status' => 'paid',
             ]);
@@ -136,14 +133,42 @@ class StripeController extends Controller
         }
     }
 
-    public function cancel()
+    public function cancel(Request $request)
     {
-        // TODO: Remove Order and ticket entries  
-    }
+        try {
+            $request->validate([
+                'session_id' => 'required|string',
+            ]);
 
+            $order = Order::where('session_id', $request->session_id)->first();
+
+            if (!$order) {
+                return response()->json(["error" => 'Order not found']);
+            }
+            if ($order->status === 'paid') {
+                return response()->json(["error" => 'Order already paid']);
+            }
+
+            $tickets = explode(', ', $order->ticket_ids);
+
+            foreach ($tickets as $ticketId) {
+                $ticket = Ticket::find($ticketId);
+
+                if ($ticket) {
+                    $ticket->delete();
+                }
+            }
+            $order->delete();
+
+            return response()->json(["success" => "success!"]);
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(["error" => 'An error occurred: ' . $e->getMessage()], 500);
+        }
+    }
     public function webhook()
     {
-        // This is your Stripe CLI webhook secret for testing your endpoint locally.
         $endpoint_secret = env('STRIPE_WEBHOOK_SECRET');
 
         $payload = @file_get_contents('php://input');
@@ -157,14 +182,11 @@ class StripeController extends Controller
                 $endpoint_secret
             );
         } catch (\UnexpectedValueException $e) {
-            // Invalid payload
             return response('', 400);
         } catch (\Stripe\Exception\SignatureVerificationException $e) {
-            // Invalid signature
             return response('', 400);
         }
 
-        // Handle the event
         switch ($event->type) {
             case 'checkout.session.completed':
                 $session = $event->data->object;
@@ -173,10 +195,30 @@ class StripeController extends Controller
                 if ($order && $order->status === 'unpaid') {
                     $order->status = 'paid';
                     $order->save();
-                    // Send email to customer
                 }
 
-                // ... handle other event types
+            case 'payment_intent.canceled':
+                $session = $event->data->object;
+                $order = Order::where('session_id', $session->id)->first();
+
+                if (!$order) {
+                    return response()->json(["error" => 'Order not found']);
+                }
+                if ($order->status === 'paid') {
+                    return response()->json(["error" => 'Order already paid']);
+                }
+
+                $tickets = explode(', ', $order->ticket_ids);
+
+                foreach ($tickets as $ticketId) {
+                    $ticket = Ticket::find($ticketId);
+
+                    if ($ticket) {
+                        $ticket->delete();
+                    }
+                }
+                $order->delete();
+
             default:
                 echo 'Received unknown event type ' . $event->type;
         }

@@ -2,6 +2,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import ConfirmPayment from "../../Database/API/ConfirmPayment";
+import NavPadding from "../../Reuse/Components/NavPadding";
 
 export default function SuccessPayment() {
     const location = useLocation();
@@ -29,12 +30,14 @@ export default function SuccessPayment() {
     if (isSuccess) {
         return (
             <div>
+                <NavPadding />
                 <h1>Payment successful!</h1>
             </div>
         );
     }
     return (
         <div>
+            <NavPadding />
             <h1>{data.data.error}</h1>
         </div>
     );

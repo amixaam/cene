@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventsController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('/payments')->group(function () {
         Route::post('/checkout', [StripeController::class, 'checkout']);
         Route::post('/success', [StripeController::class, 'success']);
+        Route::post('/cancel', [StripeController::class, 'cancel']);
+        Route::get('/history', [TicketController::class, 'getHistory']);
+        Route::post('/generatePDF', [TicketController::class, 'createPDF']);
+
         // Route::put('/{id}', [StripeController::class, 'update']);
         // Route::delete('/{id}', [StripeController::class, 'destroy']);
     });
@@ -47,6 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/signup', [AuthController::class, 'signup']);
 
+
 Route::prefix('/users')->group(function () {
     Route::get('/', [UsersController::class, 'index']);
     Route::get('/{id}', [UsersController::class, 'show']);
@@ -54,6 +60,7 @@ Route::prefix('/users')->group(function () {
 
 Route::prefix('/events')->group(function () {
     Route::get('/', [EventsController::class, 'index']);
+    Route::get('/genres', [EventsController::class, 'getGenres']);
     Route::get('/{id}', [EventsController::class, 'show']);
 });
 

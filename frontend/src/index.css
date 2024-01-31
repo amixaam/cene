@@ -147,7 +147,17 @@ body {
     display: flex;
     justify-content: center;
 }
-
+.user-circle {
+    height: 2rem;
+    aspect-ratio: 1;
+    background: linear-gradient(
+        -45deg,
+        var(--background-200),
+        var(--background-400)
+    );
+    border-radius: 50px;
+    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.2);
+}
 .scrolled {
     backdrop-filter: blur(10px);
     border-bottom: rgba(0, 0, 0, 0.2) 2px solid;

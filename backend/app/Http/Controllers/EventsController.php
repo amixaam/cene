@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Order;
 use App\Models\Review;
 use App\Models\Ticket;
 use App\Models\TicketType;
@@ -13,6 +14,42 @@ use Illuminate\Validation\ValidationException;
 
 class EventsController extends Controller
 {
+    protected function deleteOldUnpaidOrders()
+    {
+        $cutoffTime = Carbon::now()->subMinutes(10);
+
+        $orders = Order::where('status', 'unpaid')
+            ->where('created_at', '<', $cutoffTime)
+            ->get();
+
+        foreach ($orders as $order) {
+            $tickets = explode(', ', $order->ticket_ids);
+
+            // Delete associated tickets
+            foreach ($tickets as $ticketId) {
+                $ticket = Ticket::find($ticketId);
+
+                if ($ticket) {
+                    $ticket->delete();
+                }
+            }
+
+            // Delete the order itself
+            $order->delete();
+        }
+    }
+
+    public function getGenres()
+    {
+        $events = Event::with("genre")->get();
+        $genres = [];
+        foreach ($events as $key => $value) {
+            $genres[$value->genre->id] = $value->genre->name;
+        }
+
+        return response()->json($genres);
+    }
+
     public function index()
     {
         return response()->json(Event::all());
@@ -20,6 +57,8 @@ class EventsController extends Controller
 
     public function show($eventId)
     {
+        $this->deleteOldUnpaidOrders();
+
         $event = Event::with("genre", "AgeRating")->findOrFail($eventId);
 
         if (!$event) {

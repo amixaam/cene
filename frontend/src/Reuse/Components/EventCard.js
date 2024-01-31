@@ -34,8 +34,7 @@ export default function EventCard({ data, handleEventRedirect }) {
                 <div className="title-wrapper">
                     <h3>{data.name}</h3>
                     <p>
-                        {data.regular_ticket_price}€ · {data.date} ·{" "}
-                        {formattedRange}
+                        {data.date} · {formattedRange}
                     </p>
                 </div>
                 <p>{truncatedDescription}</p>

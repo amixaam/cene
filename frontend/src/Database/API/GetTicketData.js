@@ -1,13 +1,9 @@
 import axios from "axios";
 
-export default async function ConfirmPayment(session) {
+export default function GetTicketData() {
     const token = sessionStorage.getItem("token");
 
-    const body = {
-        session_id: session,
-    };
-
-    return axios.post("http://127.0.0.1:8000/api/payments/success", body, {
+    return axios.get("http://127.0.0.1:8000/api/payments/history", {
         headers: {
             Accept: "application/json",
             Authorization: `Bearer ${token}`,
