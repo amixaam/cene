@@ -1,7 +1,8 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import CancelPayment from "../../Database/API/CancelPayment";
+import NavPadding from "../../Reuse/Components/NavPadding";
 
 export default function Cancel() {
     const location = useLocation();
@@ -16,11 +17,23 @@ export default function Cancel() {
     });
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return (
+            <div>
+                <NavPadding />
+                <main className="success-main">
+                    <p>Loading...</p>
+                </main>
+            </div>
+        );
     }
 
     if (error) {
-        return <div>Error: {error.message}</div>;
+        return (
+            <div>
+                <NavPadding />
+                <main className="success-main">Error: {error.message}</main>
+            </div>
+        );
     }
 
     // Check for success response
@@ -29,13 +42,23 @@ export default function Cancel() {
     if (isSuccess) {
         return (
             <div>
-                <h1>Canceled</h1>
+                <NavPadding />
+                <main className="success-main">
+                    <h1>Payment Cancelled!</h1>
+                    <p>Hope to see you next time!</p>
+                    <Link to="/profile" className="flex-button">
+                        View Purchases
+                    </Link>
+                </main>
             </div>
         );
     }
     return (
         <div>
-            <h1>{data.data.error}</h1>
+            <NavPadding />
+            <main className="success-main">
+                <h2>{data.data.error}</h2>
+            </main>
         </div>
     );
 }

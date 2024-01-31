@@ -10,6 +10,7 @@ import StarsRating from "../../Reuse/Components/StarsRating";
 import SeatingChart from "../../Reuse/Components/SeatingChart";
 
 import "../../CSS/Event.scss";
+import NavPadding from "../../Reuse/Components/NavPadding";
 
 export default function Event({ handleLoginPopup }) {
     const { e: event_id } = useParams();
@@ -22,7 +23,14 @@ export default function Event({ handleLoginPopup }) {
     });
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return (
+            <div>
+                <NavPadding />
+                <main className="success-main">
+                    <p>Loading...</p>
+                </main>
+            </div>
+        );
     }
 
     // return <div className="d"></div>;

@@ -30,7 +30,14 @@ export default function Events() {
     const [selectedGenre, setSelectedGenre] = useState("");
 
     if (eventisLoading || genreisLoading) {
-        return <div>Loading...</div>;
+        return (
+            <div>
+                <NavPadding />
+                <main className="success-main">
+                    <p>Loading...</p>
+                </main>
+            </div>
+        );
     }
 
     const handleSearchChange = (event) => {

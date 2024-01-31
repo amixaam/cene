@@ -8,6 +8,7 @@ import SeatingChart from "../../Reuse/Components/SeatingChart";
 
 import "../../CSS/Event.scss";
 import axios from "axios";
+import NavPadding from "../../Reuse/Components/NavPadding";
 
 export default function Pay() {
     const navigate = useNavigate();
@@ -44,7 +45,14 @@ export default function Pay() {
     }, [selectedSeats]);
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return (
+            <div>
+                <NavPadding />
+                <main className="success-main">
+                    <p>Loading...</p>
+                </main>
+            </div>
+        );
     }
 
     const getTicketTypeIdByName = (name) => {

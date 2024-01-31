@@ -122,9 +122,14 @@ export default function Admin() {
                 </div>
                 <button className="flex-button">Create</button>
             </ReactModal>
-            <button className="flex-button" onClick={toggleCreateEventModal}>
-                Add Event
-            </button>
+            <main className="success-main">
+                <button
+                    className="flex-button"
+                    onClick={toggleCreateEventModal}
+                >
+                    Add Event
+                </button>
+            </main>
         </div>
     );
 }
