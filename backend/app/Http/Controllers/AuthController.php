@@ -24,7 +24,16 @@ class AuthController extends Controller
                 'email' => $request->input('email'),
                 'password' => bcrypt($request->input('password')),
             ]);
-            return response()->json($user, 201);
+
+            if (Auth::attempt($request->only('email', 'password'))) {
+                $user = $request->user();
+                $token = $user->createToken('auth_token');
+
+                return response()->json([
+                    'token' => $token->plainTextToken,
+                    'user' => $user,
+                ]);
+            }
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {

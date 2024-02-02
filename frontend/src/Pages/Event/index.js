@@ -27,11 +27,30 @@ export default function Event({ handleLoginPopup }) {
             <div>
                 <NavPadding />
                 <main className="success-main">
-                    <p>Loading...</p>
+                    <i className="bi bi-arrow-clockwise loading-anim"></i>
                 </main>
             </div>
         );
     }
+
+    const getTicketTypeIdByName = (name) => {
+        // Sort ticketTypes by price in ascending order
+        const sortedTicketTypes = [...data.ticketTypes].sort(
+            (a, b) => a.price - b.price
+        );
+
+        // Assign IDs from 1 to 4
+        const ticketTypesWithIds = sortedTicketTypes.map((type, index) => ({
+            ...type,
+            id: index + 1,
+        }));
+
+        // Find the ID by name
+        const foundType = ticketTypesWithIds.find((type) => type.name === name);
+
+        // Return the ID if found, otherwise return null
+        return foundType ? foundType.id : null;
+    };
 
     // return <div className="d"></div>;
     const { formattedStartTime, formattedEndTime } = ConvertTime(
@@ -92,7 +111,11 @@ export default function Event({ handleLoginPopup }) {
                         </div>
                         {data.ticketTypes.map((type) => (
                             <div key={type.id} className="type">
-                                <div className={`square type-${type.id}`}></div>
+                                <div
+                                    className={`square type-${getTicketTypeIdByName(
+                                        type.name
+                                    )}`}
+                                ></div>
                                 <p>{type.name}</p>
                                 <p>{type.price} €</p>
                             </div>

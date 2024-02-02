@@ -15,6 +15,8 @@ class TicketType extends Model
         'price',
     ];
 
+    public $timestamps = false;
+
     public function event()
     {
         return $this->belongsTo(Event::class);

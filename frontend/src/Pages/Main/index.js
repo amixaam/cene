@@ -11,6 +11,7 @@ import GetRandomReview from "../../Database/API/GetRandomReview";
 
 import EventCard from "../../Reuse/Components/EventCard";
 import ReviewCard from "../../Reuse/Components/ReviewCard";
+import NavPadding from "../../Reuse/Components/NavPadding";
 
 export default function Landing() {
     // Using the hook
@@ -31,6 +32,17 @@ export default function Landing() {
         queryKey: ["reviews"],
         queryFn: GetRandomReview,
     });
+
+    if (eventisLoading || reviewisLoading) {
+        return (
+            <div>
+                <NavPadding />
+                <main className="success-main">
+                    <i className="bi bi-arrow-clockwise loading-anim"></i>
+                </main>
+            </div>
+        );
+    }
 
     const handleEventRedirect = (event_id) => {
         window.location.href = `/event?e=${event_id}`;

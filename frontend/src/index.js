@@ -274,7 +274,7 @@ const App = () => {
                         <Link className="regular" to="events">
                             Events
                         </Link>
-                        {sessionStorage.getItem("role") && (
+                        {sessionStorage.getItem("role") == 1 && (
                             <Link className="regular" to="admin">
                                 Admin
                             </Link>
@@ -335,7 +335,7 @@ const App = () => {
                 <Route path="/success" element={<SuccessPayment />} />
                 <Route path="/cancel" element={<Cancel />} />
                 <Route path="/pay/:e" element={<Pay />} />
-                <Route path="/admin/edit" element={<Edit />} />
+                <Route path="/admin/edit/:e" element={<Edit />} />
             </Routes>
             <footer>
                 <div className="footer-wrapper side-margins">

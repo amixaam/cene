@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AgeRating;
 use App\Models\Event;
+use App\Models\Genre;
 use App\Models\Order;
 use App\Models\Review;
 use App\Models\Ticket;
@@ -50,16 +52,123 @@ class EventsController extends Controller
         return response()->json($genres);
     }
 
+    public function getTypes($event_id)
+    {
+        $typeArray = TicketType::where('event_id', $event_id)->get(); // Use get() to execute the query
+        $types = [];
+
+        foreach ($typeArray as $key => $value) {
+            $types[] = [
+                'id' => $value->id,
+                'name' => $value->name,
+                'price' => $value->price,
+            ];
+        }
+
+        return response()->json($types); // Return $types instead of $typeArray
+    }
+
+
+    public function getOptions()
+    {
+        $genreData = Genre::all();
+        $age_ratingData = AgeRating::all();
+
+        $genres = [];
+        foreach ($genreData as $key => $value) {
+            $genres[$value->id] = $value->name;
+        }
+
+        $age_ratings = [];
+        foreach ($age_ratingData as $key => $value) {
+            $age_ratings[$value->id] = $value->name;
+        }
+
+        return response()->json(["genres" => $genres, "age_ratings" => $age_ratings]);
+    }
+
     public function index()
     {
-        return response()->json(Event::all());
+        return response()->json(Event::all()->where('published', true));
+    }
+    public function getAllEvents()
+    {
+        return response()->json(Event::all());;
+    }
+    public function showADMIN($eventId)
+    {
+        $this->deleteOldUnpaidOrders();
+
+        $event = Event::with("genre", "AgeRating")
+            ->findOrFail($eventId);
+
+        if (!$event) {
+            return response()->json(['error' => 'Event not found'], 404);
+        }
+
+        $ratings = Review::where('event_id', $eventId)->pluck('rating');
+        $ratingAVG = $ratings->isEmpty() ? null : $ratings->avg();
+
+        $seatsData = [];
+        $maxRows = $event->max_rows;
+        $maxCols = $event->max_cols;
+
+        $specialSeats = VipSeat::where('event_id', $eventId)->get();
+        $ticketTypes = TicketType::where('event_id', $eventId)->get();
+        $ticketCount = Ticket::where('event_id', $eventId)->count();
+        $freeSeats = $maxRows * $maxCols - $ticketCount;
+        $tickets = Ticket::where('event_id', $eventId)->get();
+        $takenSeats = [];
+
+        foreach ($tickets as $ticket) {
+            $takenSeats[] = [
+                'row' => $ticket->row_num,
+                'col' => $ticket->col_num,
+            ];
+        }
+
+        $cheapestTicketType = $ticketTypes->sortBy('price')->first();
+
+        $defaultName = $cheapestTicketType->name ?? null;
+        $defaultPrice = $cheapestTicketType->price ?? null;
+
+        for ($row = 1; $row <= $maxRows; $row++) {
+            for ($col = 1; $col <= $maxCols; $col++) {
+                $seatsData[] = [
+                    'row' => $row,
+                    'col' => $col,
+                    'name' => $defaultName,
+                    'price' => $defaultPrice,
+                    'taken' => in_array(['row' => $row, 'col' => $col], $takenSeats),
+                ];
+            }
+        }
+
+        $ticketTypeMap = $ticketTypes->keyBy('id');
+
+        foreach ($specialSeats as $specialSeat) {
+            $ticketTypeId = $specialSeat->ticket_types_id;
+
+            if (isset($ticketTypeMap[$ticketTypeId])) {
+                $ticketType = $ticketTypeMap[$ticketTypeId];
+
+                $index = ($specialSeat->row_num - 1) * $maxCols + ($specialSeat->col_num - 1);
+
+                $seatsData[$index]['name'] = $ticketType->name;
+                $seatsData[$index]['price'] = $ticketType->price;
+            }
+        }
+
+        return response()->json(['event' => $event, 'ratingAVG' => $ratingAVG, 'seats' => $seatsData, 'freeSeats' => $freeSeats, 'ticketTypes' => $ticketTypes]);
     }
 
     public function show($eventId)
     {
         $this->deleteOldUnpaidOrders();
 
-        $event = Event::with("genre", "AgeRating")->findOrFail($eventId);
+        $event = Event::with("genre", "AgeRating")
+            ->where('published', true)
+            ->findOrFail($eventId);
 
         if (!$event) {
             return response()->json(['error' => 'Event not found'], 404);
@@ -133,26 +242,132 @@ class EventsController extends Controller
         try {
             $request->validate([
                 'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:10000',
-                'name' => 'required|string',
-                'description' => 'required|string',
+                'name' => 'required|string|min:1',
+                'description' => 'required|string|min:1',
                 'genre_id' => 'required|exists:genres,id',
+                'age_rating_id' => 'required|exists:age_ratings,id',
+                'max_rows' => 'required|integer|min:3|max:8',
+                'max_cols' => 'required|integer|min:3|max:18',
                 'date' => 'required|date',
                 'time' => 'required|date_format:H:i',
-                'length' => 'required|integer',
-                'regular_ticket_price' => 'required|regex:/^\d+(\.\d{1,2})?$/',
-                'vip_ticket_price' => 'required|regex:/^\d+(\.\d{1,2})?$/',
+                'length' => 'required|integer|min:1',
             ]);
+
+            if ($request->get("date")) {
+                $date = Carbon::parse($request->get("date"));
+                $now = Carbon::now();
+
+                if ($date->lt($now)) {
+                    return response()->json(['date' => 'Date must be in the future.'], 422);
+                }
+            }
 
             $file_path = $request->file('file')->store('images', 'public');
             $request->mergeIfMissing(['file_path' => asset("storage/$file_path")]);
 
-            $event = Event::create($request->all());
 
-            return response()->json($event);
+            // $event = Event::create($request->all());
+            $event = Event::create($request->all() + ['updated_at' => now(), 'created_at' => now()]);
+
+            $ticketTypes = TicketType::create([
+                'name' => 'Regular',
+                'price' => 6.99,
+                'event_id' => $event->id,
+            ]);
+
+            return response()->json([$event, $ticketTypes]);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Something went wrong.', $e], 500);
+            return response()->json(['error' => $e], 500);
+        }
+    }
+
+    public function publishEvent($event_id)
+    {
+        $event = Event::find($event_id);
+
+        $event->published = !$event->published;
+
+        $event->save();
+    }
+
+
+    public function destroyEvent($event_id)
+    {
+        // Check if there are any tickets associated with the event
+        if (Ticket::where('event_id', $event_id)->exists()) {
+            return response()->json(['error' => 'Cannot delete Event that has already been purchased.'], 422);
+        }
+
+        // Delete associated records
+        TicketType::where('event_id', $event_id)->delete();
+        VipSeat::where('event_id', $event_id)->delete();
+
+        // Delete the event
+        Event::destroy($event_id);
+    }
+
+    public function destroyType($type_id)
+    {
+        $tickets = Ticket::where('ticket_types_id', $type_id)->get();
+
+        if (!$tickets->isEmpty()) {
+            return response()->json(['error' => 'Cannot delete Ticket Type that has already been purchased.'], 422);
+        }
+
+        VipSeat::where('ticket_types_id', $type_id)->delete();
+        $type = TicketType::find($type_id);
+        if ($type) {
+            $type->delete();
+            return response()->json(['message' => 'Ticket type deleted successfully.']);
+        } else {
+            return response()->json(['error' => 'Ticket type not found.'], 404);
+        }
+    }
+
+    public function createType(Request $request)
+    {
+        try {
+            $request->validate([
+                'event_id' => 'required|exists:events,id',
+                'name' => 'required|string|min:1',
+                'price' => 'required|numeric|min:0.01',
+            ]);
+            $ticketType = TicketType::create($request->all());
+
+            return response()->json($ticketType);
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e], 500);
+        }
+    }
+
+    public function addVIPSeats(Request $request)
+    {
+        try {
+            $seats = [];
+            foreach ($request->get('seats') as $key => $value) {
+                VipSeat::where('event_id', $request->get('event'))
+                    ->where('row_num', $value['row'])
+                    ->where('col_num', $value['col'])
+                    ->delete();
+
+                $seats[] = [
+                    'event_id' => $request->get('event'),
+                    'ticket_types_id' => $request->get('type'),
+                    'row_num' => $value['row'],
+                    'col_num' => $value['col'],
+                ];
+            }
+
+            // return response()->json($seats);
+            VipSeat::insert($seats);
+
+            return response()->json('seats created!');
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e], 500);
         }
     }
 }

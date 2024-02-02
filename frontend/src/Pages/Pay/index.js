@@ -14,6 +14,7 @@ export default function Pay() {
     const navigate = useNavigate();
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [loadingButton, setLoadingButton] = useState(false);
     const { e: event_id } = useParams();
 
     const { data, error, isLoading } = useQuery({
@@ -49,7 +50,7 @@ export default function Pay() {
             <div>
                 <NavPadding />
                 <main className="success-main">
-                    <p>Loading...</p>
+                    <i className="bi bi-arrow-clockwise loading-anim"></i>
                 </main>
             </div>
         );
@@ -61,6 +62,7 @@ export default function Pay() {
     };
 
     const handlePurchaseRedirect = async () => {
+        setLoadingButton(true);
         const token = sessionStorage.getItem("token");
         const purchaseData = {
             event_id: data.event.id,
@@ -80,8 +82,10 @@ export default function Pay() {
 
             // Redirect to the checkout URL
             setSelectedSeats([]);
+            setLoadingButton(false);
             window.location.replace(checkoutUrl);
         } catch (error) {
+            setLoadingButton(false);
             console.error("Error fetching checkout data:", error);
             // Handle the error, e.g., show an error message to the user
         }
@@ -143,8 +147,13 @@ export default function Pay() {
                             className="flex-button"
                             disabled={selectedSeats.length === 0}
                             onClick={handlePurchaseRedirect}
+                            aria-disabled={selectedSeats.length === 0}
                         >
-                            Pay {totalPrice ? totalPrice + " €" : ""}
+                            {loadingButton ? (
+                                <i className="bi bi-arrow-clockwise small-loading-anim"></i>
+                            ) : (
+                                `Pay ${totalPrice ? totalPrice + " €" : ""}`
+                            )}
                         </button>
                     </div>
                 </div>

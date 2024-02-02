@@ -34,7 +34,7 @@ export default function Events() {
             <div>
                 <NavPadding />
                 <main className="success-main">
-                    <p>Loading...</p>
+                    <i className="bi bi-arrow-clockwise loading-anim"></i>
                 </main>
             </div>
         );
@@ -108,6 +108,7 @@ export default function Events() {
                                 key={item.id}
                             />
                         ))
+                        // <p></p>
                     )}
                 </div>
             </div>

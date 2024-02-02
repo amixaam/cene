@@ -59,6 +59,9 @@ export default function Payments() {
             </p>
         );
     }
+    if (paymentError || !paymentData.data || paymentData.data.length === 0) {
+        return <p className="loading-screen">No Payments made.</p>;
+    }
 
     return (
         <>

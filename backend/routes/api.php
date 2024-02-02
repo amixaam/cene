@@ -31,9 +31,13 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('/events')->group(function () {
+        Route::post('/type', [EventsController::class, 'createType']);
+        Route::post('/seats', [EventsController::class, 'addVIPSeats']);
+        Route::delete('/type/{type_id}', [EventsController::class, 'destroyType']);
         Route::post('/', [EventsController::class, 'store']);
+        Route::delete('/{id}', [EventsController::class, 'destroyEvent']);
+        Route::get('/publish/{event_id}', [EventsController::class, 'publishEvent']);
         Route::put('/{id}', [EventsController::class, 'update']);
-        Route::delete('/{id}', [EventsController::class, 'destroy']);
     });
 
     Route::prefix('/payments')->group(function () {
@@ -59,9 +63,13 @@ Route::prefix('/users')->group(function () {
 });
 
 Route::prefix('/events')->group(function () {
+    Route::get('/all', [EventsController::class, 'getAllEvents']);
+    Route::get('/options', [EventsController::class, 'getOptions']);
     Route::get('/', [EventsController::class, 'index']);
     Route::get('/genres', [EventsController::class, 'getGenres']);
+    Route::get('/types/{event_id}', [EventsController::class, 'getTypes']);
     Route::get('/{id}', [EventsController::class, 'show']);
+    Route::get('/all/{id}', [EventsController::class, 'showADMIN']);
 });
 
 Route::prefix('/reviews')->group(function () {

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('vip_seats', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained();
-            $table->foreignId('ticket_types_id')->constrained();
+            $table->foreignId('ticket_types_id')->constrained()->onDelete('cascade');
             $table->integer('row_num');
             $table->integer('col_num');
             $table->timestamps();

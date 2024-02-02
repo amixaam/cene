@@ -11,8 +11,22 @@ const SeatingChart = ({
     selectedSeats = [],
 }) => {
     const getTicketTypeIdByName = (name) => {
-        const index = ticketTypes.findIndex((type) => type.name === name);
-        return index !== -1 ? index : null;
+        // Sort ticketTypes by price in ascending order
+        const sortedTicketTypes = [...ticketTypes].sort(
+            (a, b) => a.price - b.price
+        );
+
+        // Assign IDs from 1 to 4
+        const ticketTypesWithIds = sortedTicketTypes.map((type, index) => ({
+            ...type,
+            id: index + 1,
+        }));
+
+        // Find the ID by name
+        const foundType = ticketTypesWithIds.find((type) => type.name === name);
+
+        // Return the ID if found, otherwise return null
+        return foundType ? foundType.id : null;
     };
 
     const handleSeatClick = (row, col, name, price, taken) => {

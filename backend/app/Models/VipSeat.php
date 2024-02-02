@@ -11,6 +11,7 @@ class VipSeat extends Model
         'event_id',
         'row_num',
         'col_num',
+        'ticket_types_id'
     ];
     use HasFactory;
 

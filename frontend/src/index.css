@@ -454,3 +454,27 @@ footer {
         align-items: flex-start;
     }
 }
+
+.type-1 {
+    background-color: #ffbe99;
+}
+.type-2 {
+    background-color: #a19ad0;
+}
+.type-3 {
+    background-color: #ffaad8;
+}
+.type-4 {
+    background-color: #c7e38c;
+}
+
+.loading-anim {
+    color: var(--background-300);
+    font-size: 2rem;
+    animation: rotate 2s ease infinite;
+}
+.small-loading-anim {
+    color: var(--text);
+    font-size: 1.3rem;
+    animation: rotate 2s ease infinite;
+}

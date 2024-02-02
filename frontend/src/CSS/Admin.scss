@@ -1,3 +1,8 @@
+.admin-main {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
 .input-container {
     width: 100%;
     .text {
@@ -10,5 +15,49 @@
 .form {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+    gap: 1rem;
+
+    .date-time,
+    .seats,
+    .general,
+    .filtering {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    select {
+        box-shadow: none;
+    }
+}
+
+.content-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+    height: 87vh;
+    margin: 1rem;
+    .event-container {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        padding: 0.5rem;
+        border-radius: 15px;
+        background-color: var(--background-100);
+
+        img {
+            height: 5rem;
+            aspect-ratio: 1;
+            border-radius: 9px;
+        }
+
+        .event-info {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            height: 100%;
+            align-items: center;
+            min-width: 20rem;
+        }
+    }
 }

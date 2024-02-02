@@ -13,12 +13,13 @@ class Event extends Model
         'name',
         'description',
         'genre_id',
+        'age_rating_id',
         'date',
         'file_path',
         'time',
         'length',
-        'regular_ticket_price',
-        'vip_ticket_price',
+        'max_rows',
+        'max_cols'
     ];
 
     public function genre()
