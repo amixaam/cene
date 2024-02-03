@@ -1,55 +1,25 @@
 import React, { useEffect, useState } from "react";
 import NavPadding from "../../Reuse/Components/NavPadding";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ReactModal from "react-modal";
 
 import "../../CSS/Admin.scss";
 
-import CreateEvent from "../../Database/API/CreateEvent";
 import { useQuery } from "@tanstack/react-query";
-import GetOptions from "../../Database/API/GetOptions";
-import GetAllEvents from "../../Database/API/GetAllEvents";
+import Get from "../../Database/API/Get";
+import Post from "../../Database/API/Post";
+import Delete from "../../Database/API/Delete";
+
+import Events from "./Events";
+import Genres from "./Genres";
+import AgeRatings from "./AgeRatings";
+import LoadingScreen from "../../Reuse/Components/LoadingScreen";
+import Input from "../../Reuse/Components/Input";
 
 export default function Admin() {
-    const [createEventModal, setCreateEventModal] = useState(false);
-    const [createEventErrors, setCreateEventErrors] = useState({
-        file: ["-"],
-        name: ["-"],
-        description: ["-"],
-        date: ["-"],
-        time: ["-"],
-        length: ["-"],
-        max_cols: ["-"],
-        max_rows: ["-"],
-        age_rating_id: ["-"],
-        genre_id: ["-"],
-    });
-
-    const toggleCreateEventModal = () => {
-        resetCreateEventErrors();
-        setCreateEventModal(!createEventModal);
-    };
-
-    const {
-        data: optionsData,
-        error: optionsError,
-        isLoading: optionsisLoading,
-    } = useQuery({
-        queryKey: ["options"],
-        queryFn: GetOptions,
-    });
-
-    const {
-        data: eventsData,
-        error: eventsError,
-        isLoading: eventsisLoading,
-        refetch: refetchEvents,
-    } = useQuery({
-        queryKey: ["events", "admin"],
-        queryFn: GetAllEvents,
-    });
-
     const navigate = useNavigate();
+
+    // AUTH
     const checkAuth = () => {
         if (!sessionStorage.getItem("token")) {
             navigate("/");
@@ -59,245 +29,347 @@ export default function Admin() {
         checkAuth();
     }, []);
 
-    const resetCreateEventErrors = () => {
-        setCreateEventErrors({
-            file: ["-"],
-            name: ["-"],
-            description: ["-"],
-            date: ["-"],
-            time: ["-"],
-            length: ["-"],
-            max_cols: ["-"],
-            max_rows: ["-"],
-            age_rating_id: ["-"],
-            genre_id: ["-"],
-        });
+    // NAVIGATION
+    const [currentView, setcurrentView] = useState("events");
+
+    // MODALS
+    const [isFormSubmitting, setisFormSubmitting] = useState(false);
+    const [isDeleting, setisDeleting] = useState(false);
+    const [formErrors, setFormErrors] = useState({});
+    const [messageNotice, setmessageNotice] = useState(null);
+
+    const [createEventModal, setCreateEventModal] = useState(false);
+    const [createGenreModal, setCreateGenreModal] = useState(false);
+    const [createAgeRatingModal, setCreateAgeRatingModal] = useState(false);
+
+    const decideModalToggle = () => {
+        setFormErrors({});
+        switch (currentView) {
+            case "events":
+                setCreateEventModal(!createEventModal);
+                break;
+
+            case "genres":
+                setCreateGenreModal(!createGenreModal);
+                break;
+
+            case "ageRatings":
+                setCreateAgeRatingModal(!createAgeRatingModal);
+                break;
+        }
     };
 
-    const handleCreateProject = async (e) => {
+    // FORMS
+    const submitForm = async (e) => {
         e.preventDefault();
+        setisFormSubmitting(true);
         const formData = new FormData(e.target);
-
-        try {
-            formData.append("file", e.target.elements.image.files[0], "jun");
-        } catch {
-            formData.append("file", null);
-        }
-
-        const data = {
-            name: formData.get("name"),
-            description: formData.get("description"),
-            date: formData.get("date"),
-            time: formData.get("time"),
-            length: formData.get("length"),
-            max_cols: formData.get("cols"),
-            max_rows: formData.get("rows"),
-            file: formData.get("file"),
-            age_rating_id: formData.get("rating"),
-            genre_id: formData.get("genre"),
-        };
-
-        const result = await CreateEvent(data);
+        const data = Object.fromEntries(formData);
+        const token = sessionStorage.getItem("token");
+        const result = await Post(currentView, token, data);
         console.log(result);
-        if (result.errors) {
-            // resetCreateEventErrors();
-            // console.log(createEventErrors);
-            setCreateEventErrors({
-                ...{
-                    file: ["-"],
-                    name: ["-"],
-                    description: ["-"],
-                    date: ["-"],
-                    time: ["-"],
-                    length: ["-"],
-                    max_cols: ["-"],
-                    max_rows: ["-"],
-                    age_rating_id: ["-"],
-                    genre_id: ["-"],
-                },
-                ...result.errors,
-            });
+        setisFormSubmitting(false);
+        if (result.errors || result.message) {
+            if (result.message) {
+                decideModalToggle();
+                await refetchEvents();
+                await refetchOptions();
+                setmessageNotice(result.message);
+            } else {
+                console.log(result.errors);
+                setFormErrors(result.errors);
+            }
         } else {
-            toggleCreateEventModal();
-            refetchEvents();
+            decideModalToggle();
+            await refetchEvents();
+            await refetchOptions();
         }
     };
 
-    if (optionsisLoading || eventsisLoading)
-        return (
-            <div>
-                <NavPadding />
-                <main className="success-main">
-                    <i className="bi bi-arrow-clockwise loading-anim"></i>
-                </main>
-            </div>
-        );
+    useEffect(() => {
+        if (messageNotice) {
+            setTimeout(() => {
+                setmessageNotice(null);
+            }, 3000);
+        }
+    }, [messageNotice]);
+
+    // QUERIES
+    const {
+        data: optionsData,
+        isLoading: optionsisLoading,
+        refetch: refetchOptions,
+    } = useQuery({
+        queryKey: ["events", "options"],
+        queryFn: async () => {
+            return await Get("events/options");
+        },
+    });
+
+    const {
+        data: eventsData,
+        isLoading: eventsisLoading,
+        refetch: refetchEvents,
+    } = useQuery({
+        queryKey: ["events", "admin"],
+        queryFn: async () => {
+            return await Get("events/all");
+        },
+    });
+
+    const deleteOption = async (id) => {
+        setisDeleting(id);
+        const token = sessionStorage.getItem("token");
+        const result = await Delete(currentView, token, id);
+        setisDeleting(false);
+        if (result.errors || result.message) {
+            if (result.message) {
+                await refetchOptions();
+                setmessageNotice(result.message);
+            } else {
+                console.log(result.errors);
+                setFormErrors(result.errors);
+            }
+        } else {
+            await refetchOptions();
+        }
+    };
+
+    if (optionsisLoading || eventsisLoading) return <LoadingScreen />;
+
     return (
         <div>
             <NavPadding />
+            <div className="message-feedback">
+                <p className={messageNotice ? "message-active" : ""}>
+                    {messageNotice}
+                </p>
+            </div>
             <ReactModal
                 isOpen={createEventModal}
-                onRequestClose={toggleCreateEventModal}
+                onRequestClose={decideModalToggle}
                 overlayClassName="login-modal-overlay"
                 className="login-modal-content"
                 closeTimeoutMS={300}
             >
                 <h2>Create Event</h2>
-                <form onSubmit={handleCreateProject} className="form">
-                    <div className="date-time">
-                        <div className="input-container">
-                            <p>Date</p>
-                            <input
-                                type="date"
-                                className="flex-input"
+                <form className="form" onSubmit={submitForm}>
+                    <div className="input-grid">
+                        <div className="date-time">
+                            <Input
                                 name="date"
+                                type="date"
+                                error={formErrors.date ? formErrors.date : ""}
                             />
-                            <p>{createEventErrors.date[0]}</p>
-                        </div>
-                        <div className="input-container">
-                            <p>Time</p>
-                            <input
-                                type="time"
-                                className="flex-input"
+                            <Input
                                 name="time"
+                                type="time"
+                                error={formErrors.time ? formErrors.time : ""}
                             />
-                            <p>{createEventErrors.time[0]}</p>
-                        </div>
-                        <div className="input-container">
-                            <p>Length</p>
-                            <input
-                                type="number"
-                                className="flex-input"
+                            <Input
                                 name="length"
-                            />
-                            <p>{createEventErrors.length[0]}</p>
-                        </div>
-                    </div>
-                    <div className="seats">
-                        <div className="input-container">
-                            <p>Max cols</p>
-                            <input
                                 type="number"
-                                className="flex-input"
-                                name="cols"
+                                error={
+                                    formErrors.length ? formErrors.length : ""
+                                }
                             />
-                            <p>{createEventErrors.max_cols[0]}</p>
                         </div>
-                        <div className="input-container">
-                            <p>Max Rows</p>
-                            <input
-                                type="number"
-                                className="flex-input"
-                                name="rows"
-                                max={7}
-                            />
-                            <p>{createEventErrors.max_rows[0]}</p>
-                        </div>
-                    </div>
-                    <div className="general">
-                        <div className="input-container">
-                            <p>Name</p>
-                            <input
-                                type="text"
-                                className="flex-input"
+                        <div className="general">
+                            <Input
                                 name="name"
-                            />
-                            <p>{createEventErrors.name[0]}</p>
-                        </div>
-                        <div className="input-container">
-                            <p>Description</p>
-                            <input
                                 type="text"
-                                className="flex-input"
+                                error={formErrors.name ? formErrors.name : ""}
+                            />
+                            <Input
                                 name="description"
+                                type="text"
+                                error={
+                                    formErrors.description
+                                        ? formErrors.description
+                                        : ""
+                                }
                             />
-                            <p>{createEventErrors.description[0]}</p>
-                        </div>
-                        <div className="input-container">
-                            <p>Image</p>
-                            <input
+                            <Input
+                                name="file"
+                                displayName="image"
                                 type="file"
-                                className="flex-input"
-                                name="image"
+                                error={formErrors.file ? formErrors.file : ""}
                             />
-                            <p>{createEventErrors.file[0]}</p>
+                        </div>
+                        <div className="seats">
+                            <Input
+                                name="max_cols"
+                                displayName="max columns"
+                                type="number"
+                                error={
+                                    formErrors.max_cols
+                                        ? formErrors.max_cols
+                                        : ""
+                                }
+                            />
+                            <Input
+                                name="max_rows"
+                                displayName="max rows"
+                                type="number"
+                                error={
+                                    formErrors.max_rows
+                                        ? formErrors.max_rows
+                                        : ""
+                                }
+                            />
+                        </div>
+                        <div className="filtering">
+                            <Input
+                                name="genre_id"
+                                displayName="genre"
+                                type="select"
+                                options={optionsData.genres}
+                                error={
+                                    formErrors.genre_id
+                                        ? formErrors.genre_id
+                                        : ""
+                                }
+                            />
+                            <Input
+                                name="age_rating_id"
+                                displayName="age rating"
+                                type="select"
+                                options={optionsData.age_ratings}
+                                error={
+                                    formErrors.age_rating_id
+                                        ? formErrors.age_rating_id
+                                        : ""
+                                }
+                            />
                         </div>
                     </div>
-                    <div className="filtering">
-                        <>
-                            <div className="input-container">
-                                <p>Genre</p>
-                                <select name="genre" className="flex-input">
-                                    <option disabled selected="true">
-                                        Select
-                                    </option>
-                                    {Object.entries(optionsData.genres).map(
-                                        ([key, value]) => (
-                                            <option key={key} value={key}>
-                                                {value}
-                                            </option>
-                                        )
-                                    )}
-                                </select>
-                                <p>{createEventErrors.genre_id[0]}</p>
-                            </div>
-                            <div className="input-container">
-                                <p>Age rating</p>
-                                <select className="flex-input" name="rating">
-                                    <option disabled selected="true">
-                                        Select
-                                    </option>
-                                    {Object.entries(
-                                        optionsData.age_ratings
-                                    ).map(([key, value]) => (
-                                        <option key={key} value={key}>
-                                            {value}
-                                        </option>
-                                    ))}
-                                </select>
-                                <p>{createEventErrors.age_rating_id[0]}</p>
-                            </div>
-                        </>
-                    </div>
-                    <button className="flex-button" type="submit">
-                        Create
+                    <button className="flex-button" type="sumbit">
+                        {isFormSubmitting ? (
+                            <i className="bi bi-arrow-clockwise small-loading-anim"></i>
+                        ) : (
+                            "Create"
+                        )}
                     </button>
                 </form>
             </ReactModal>
-            <main className="admin-main">
-                <div className="sidebar">
-                    <button
-                        className="flex-button"
-                        onClick={toggleCreateEventModal}
-                    >
-                        Add Event
+            <ReactModal
+                isOpen={createGenreModal}
+                onRequestClose={decideModalToggle}
+                overlayClassName="login-modal-overlay"
+                className="login-modal-content"
+                closeTimeoutMS={300}
+            >
+                <h2>Create Genre</h2>
+                <form className="form" onSubmit={submitForm}>
+                    <div className="date-time">
+                        <Input
+                            name="name"
+                            placeholder="Comedy..."
+                            error={formErrors.name ? formErrors.name : ""}
+                        />
+                    </div>
+                    <button className="flex-button" type="sumbit">
+                        {isFormSubmitting ? (
+                            <i className="bi bi-arrow-clockwise small-loading-anim"></i>
+                        ) : (
+                            "Create"
+                        )}
                     </button>
+                </form>
+            </ReactModal>
+            <ReactModal
+                isOpen={createAgeRatingModal}
+                onRequestClose={decideModalToggle}
+                overlayClassName="login-modal-overlay"
+                className="login-modal-content"
+                closeTimeoutMS={300}
+            >
+                <h2>Create Age Rating</h2>
+                <form className="form" onSubmit={submitForm}>
+                    <div className="date-time">
+                        <Input
+                            name="name"
+                            displayName="rating"
+                            placeholder="+7..."
+                            error={formErrors.name ? formErrors.name : ""}
+                        />
+                    </div>
+                    <button className="flex-button" type="sumbit">
+                        {isFormSubmitting ? (
+                            <i className="bi bi-arrow-clockwise small-loading-anim"></i>
+                        ) : (
+                            "Create"
+                        )}
+                    </button>
+                </form>
+            </ReactModal>
+            <main className="side-bar-view">
+                <div className="side-bar">
+                    <div className="selections">
+                        <button
+                            onClick={() => {
+                                setcurrentView("events");
+                            }}
+                            className={
+                                currentView === "events" ? "selected" : ""
+                            }
+                        >
+                            Events
+                        </button>
+                        <button
+                            onClick={() => {
+                                setcurrentView("genres");
+                            }}
+                            className={
+                                currentView === "genres" ? "selected" : ""
+                            }
+                        >
+                            Genres
+                        </button>
+                        <button
+                            onClick={() => {
+                                setcurrentView("ageRatings");
+                            }}
+                            className={
+                                currentView === "ageRatings" ? "selected" : ""
+                            }
+                        >
+                            Age Ratings
+                        </button>
+                    </div>
+                    <hr />
+                    <h3>Statistics</h3>
+                    {/* <p>Total Revenue:</p> */}
+                    {/* <p>Total Reruns:</p> */}
+                    {/* <p>Total Reviews:</p> */}
+                    <p>Events: {eventsData.length}</p>
+                    <p>Genres: {Object.keys(optionsData.genres).length}</p>
+                    <p>
+                        Age Ratings:{" "}
+                        {Object.keys(optionsData.age_ratings).length}
+                    </p>
                 </div>
-                <div className="content-container">
-                    {eventsisLoading ? (
-                        <p className="loading-screen"></p>
-                    ) : (
-                        eventsData.map((event) => (
-                            <div className="event-container" key={event.id}>
-                                <img src={event.file_path} alt="" />
-                                <div className="event-info">
-                                    <div className="left-side">
-                                        <h3>{event.name}</h3>
-                                        <p>published?</p>
-                                        <p>seats taken</p>
-                                        <p>total revenue</p>
-                                    </div>
-                                    <div className="right-side">
-                                        <Link
-                                            to={`edit/${event.id}`}
-                                            className="flex-button"
-                                        >
-                                            Edit
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-                        ))
+                <div className="side-bar-content-view gap-1">
+                    <i
+                        className="bi bi-patch-plus-fill create-new"
+                        onClick={decideModalToggle}
+                    ></i>
+                    {currentView === "events" && (
+                        <Events eventsData={eventsData} />
+                    )}
+                    {currentView === "genres" && (
+                        <Genres
+                            data={optionsData.genres}
+                            deleteFn={deleteOption}
+                            isDeleting={isDeleting}
+                        />
+                    )}
+                    {currentView === "ageRatings" && (
+                        <AgeRatings
+                            data={optionsData.age_ratings}
+                            deleteFn={deleteOption}
+                            isDeleting={isDeleting}
+                        />
                     )}
                 </div>
             </main>

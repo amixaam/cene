@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -11,9 +11,12 @@ import SeatingChart from "../../Reuse/Components/SeatingChart";
 
 import "../../CSS/Event.scss";
 import NavPadding from "../../Reuse/Components/NavPadding";
+import GetReviews from "../../Database/API/GetReviews";
 
 export default function Event({ handleLoginPopup }) {
     const { e: event_id } = useParams();
+
+    const [isInputActive, setInputActive] = useState(false);
 
     const { data, error, isLoading } = useQuery({
         queryKey: ["payment", "success", event_id],
@@ -22,7 +25,16 @@ export default function Event({ handleLoginPopup }) {
         },
     });
 
-    if (isLoading) {
+    const {
+        data: reviewData,
+        error: reviewError,
+        isLoading: reviewisLoading,
+    } = useQuery({
+        queryKey: ["refiews"],
+        queryFn: GetReviews,
+    });
+
+    if (isLoading || reviewisLoading) {
         return (
             <div>
                 <NavPadding />
@@ -32,7 +44,7 @@ export default function Event({ handleLoginPopup }) {
             </div>
         );
     }
-
+    console.log(reviewData);
     const getTicketTypeIdByName = (name) => {
         // Sort ticketTypes by price in ascending order
         const sortedTicketTypes = [...data.ticketTypes].sort(
@@ -130,6 +142,54 @@ export default function Event({ handleLoginPopup }) {
                 </div>
                 <div className="review-wrapper">
                     <h2>Reviews</h2>
+                    <div
+                        className="create-review-form"
+                        onFocus={() => {
+                            setInputActive(true);
+                        }}
+                        onBlur={() => {
+                            setInputActive(false);
+                        }}
+                    >
+                        <input type="text" placeholder="Leave your review..." />
+                        <div
+                            className={`hidden-review ${
+                                isInputActive ? "form-active" : ""
+                            }`}
+                        >
+                            <div>
+                                <input
+                                    type="text"
+                                    className="title-input"
+                                    placeholder="Title"
+                                />
+                                <div className="star-form">
+                                    <i className="bi bi-star"></i>
+                                    <i className="bi bi-star"></i>
+                                    <i className="bi bi-star"></i>
+                                    <i className="bi bi-star"></i>
+                                    <i className="bi bi-star"></i>
+                                </div>
+                                <button className="flex-button-review">
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {reviewData.map((review) => {
+                        return (
+                            <div
+                                key={review.id}
+                                className="event-review-container"
+                            >
+                                <div className="review-title">
+                                    <h3>{review.user.name}</h3>
+                                    <StarsRating rating={review.rating} />
+                                </div>
+                                <p>{review.description}</p>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>

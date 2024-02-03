@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\AgeRatingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventsController;
+use App\Http\Controllers\GenreController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UsersController;
@@ -50,6 +52,18 @@ Route::middleware('auth:sanctum')->group(function () {
         // Route::put('/{id}', [StripeController::class, 'update']);
         // Route::delete('/{id}', [StripeController::class, 'destroy']);
     });
+
+    Route::prefix('/genres')->group(function () {
+        Route::post('/', [GenreController::class, 'store']);
+        Route::delete('/{id}', [GenreController::class, 'destroy']);
+        Route::put('/{id}', [GenreController::class, 'update']);
+    });
+
+    Route::prefix('/ageRatings')->group(function () {
+        Route::post('/', [AgeRatingController::class, 'store']);
+        Route::delete('/{id}', [AgeRatingController::class, 'destroy']);
+        Route::put('/{id}', [AgeRatingController::class, 'update']);
+    });
 });
 
 // GUEST ACTIONS
@@ -74,4 +88,15 @@ Route::prefix('/events')->group(function () {
 
 Route::prefix('/reviews')->group(function () {
     Route::get('/random', [EventsController::class, 'getRandomReview']);
+    Route::get('/', [EventsController::class, 'getAllReviews']);
+});
+
+Route::prefix('/genres')->group(function () {
+    Route::get('/', [GenreController::class, 'index']);
+    Route::get('/{id}', [GenreController::class, 'show']);
+});
+
+Route::prefix('/ageRatings')->group(function () {
+    Route::get('/', [AgeRatingController::class, 'index']);
+    Route::get('/{id}', [AgeRatingController::class, 'show']);
 });

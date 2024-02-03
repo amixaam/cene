@@ -125,67 +125,82 @@ export default function Edit() {
                     </button>
                 </div>
             </ReactModal>
-            <div className="edit-view">
+            <div className="side-bar-view">
                 <div className="side-bar">
-                    <button
-                        className={`flex-button ${
-                            currentPage === "General" ? "selected-button" : ""
-                        }`}
-                        onClick={() => {
-                            setCurrentPage("General");
-                        }}
-                    >
-                        General
-                    </button>
-                    <button
-                        className={`flex-button ${
-                            currentPage === "Seats" ? "selected-button" : ""
-                        }`}
-                        onClick={() => {
-                            setCurrentPage("Seats");
-                        }}
-                    >
-                        Seats & Tickets
-                    </button>
-                    <button
-                        className={`flex-button ${
-                            currentPage === "Time" ? "selected-button" : ""
-                        }`}
-                        onClick={() => {
-                            setCurrentPage("Time");
-                        }}
-                    >
-                        Time & Date
-                    </button>
-                    <div className="buttons">
+                    <div className="selections">
                         <button
-                            className={`flex-button ${
-                                data.event.published ? "gray-out" : ""
-                            }`}
-                            onClick={handleTogglePublishPopup}
-                            disabled={data.event.published}
+                            className={
+                                currentPage === "General" ? "selected" : ""
+                            }
+                            onClick={() => {
+                                setCurrentPage("General");
+                            }}
                         >
-                            Publish
+                            General
                         </button>
                         <button
-                            className="flex-button"
-                            onClick={handleToggleConfirmPopup}
+                            className={
+                                currentPage === "Seats" ? "selected" : ""
+                            }
+                            onClick={() => {
+                                setCurrentPage("Seats");
+                            }}
                         >
-                            <i className="bi bi-trash-fill"></i>
+                            Seats
                         </button>
+                        <button
+                            className={currentPage === "Time" ? "selected" : ""}
+                            onClick={() => {
+                                setCurrentPage("Time");
+                            }}
+                        >
+                            Time & Date
+                        </button>
+                        <button
+                            className={
+                                currentPage === "Images" ? "selected" : ""
+                            }
+                            onClick={() => {
+                                setCurrentPage("Images");
+                            }}
+                        >
+                            Images
+                        </button>
+                        <button
+                            className={
+                                currentPage === "Reruns" ? "selected" : ""
+                            }
+                            onClick={() => {
+                                setCurrentPage("Reruns");
+                            }}
+                        >
+                            Reruns
+                        </button>
+                        <div className="row">
+                            <button
+                                className={
+                                    data.event.published ? "disabled" : ""
+                                }
+                                onClick={handleTogglePublishPopup}
+                                disabled={data.event.published}
+                            >
+                                {data.event.published ? "Ongoing" : "Rerun"}
+                            </button>
+                            <button onClick={handleToggleConfirmPopup}>
+                                <i className="bi bi-trash-fill"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div className="stats">
-                        <h3>Statistics</h3>
-                        <p>Revenue</p>
-                        <p>Tickets Sold</p>
-                        <p>Ratings</p>
-                        <p>Avrg. Rating</p>
-                    </div>
+                    <hr />
+                    <p>Current run</p>
+                    <hr />
+                    <h3>Statistics</h3>
+                    <p>Revenue</p>
+                    <p>Tickets Sold</p>
+                    <p>Ratings</p>
+                    <p>Avrg. Rating</p>
                 </div>
-                <div className="edit-content-wrapper">
-                    <Link to="/admin" className="flex-button edit-back">
-                        <i className="bi bi-caret-left-fill"></i>
-                    </Link>
+                <div className="side-bar-content-view">
                     {currentPage === "General" && <General />}
                     {currentPage === "Seats" && <Seats e={event_id} />}
                     {currentPage === "Time" && <Time />}

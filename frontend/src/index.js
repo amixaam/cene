@@ -15,6 +15,7 @@ import ReactModal from "react-modal";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./index.css";
+import "./CSS/UniversalSidebar.scss";
 
 import Fav1 from "./Images/Decoration/fav1.svg";
 import Fav2 from "./Images/Decoration/fav2.svg";

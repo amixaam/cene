@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import GetEvents from "../../Database/API/GetEvents";
 import EventCard from "../../Reuse/Components/EventCard";
 import GetGenres from "../../Database/API/GetGenres";
+import GetReviews from "../../Database/API/GetReviews";
 
 export default function Events() {
     const {

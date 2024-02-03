@@ -36,4 +36,9 @@ class Event extends Model
     {
         return $this->hasMany(TicketType::class);
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

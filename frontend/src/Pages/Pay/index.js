@@ -75,7 +75,7 @@ export default function Pay() {
             const response = await axios.post(urlEndpoint, purchaseData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json", // Adjust content type as needed
+                    "Content-Type": "application/json",
                 },
             });
             const checkoutUrl = response.data;
@@ -87,7 +87,6 @@ export default function Pay() {
         } catch (error) {
             setLoadingButton(false);
             console.error("Error fetching checkout data:", error);
-            // Handle the error, e.g., show an error message to the user
         }
     };
 

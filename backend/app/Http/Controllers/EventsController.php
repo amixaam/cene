@@ -93,7 +93,13 @@ class EventsController extends Controller
     }
     public function getAllEvents()
     {
-        return response()->json(Event::all());;
+        $events = Event::with('reviews')->get();
+        return response()->json($events);
+    }
+
+    public function getAllReviews()
+    {
+        return response()->json(Review::with('user')->get());
     }
     public function showADMIN($eventId)
     {
@@ -258,7 +264,7 @@ class EventsController extends Controller
                 $now = Carbon::now();
 
                 if ($date->lt($now)) {
-                    return response()->json(['date' => 'Date must be in the future.'], 422);
+                    return response()->json(['errors' => ['date' => 'Date must be in the future.']], 422);
                 }
             }
 
@@ -275,11 +281,11 @@ class EventsController extends Controller
                 'event_id' => $event->id,
             ]);
 
-            return response()->json([$event, $ticketTypes]);
+            return response()->json(['message' => "Event created successfully!"]);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e], 500);
+            return response()->json(['errors' => $e], 500);
         }
     }
 

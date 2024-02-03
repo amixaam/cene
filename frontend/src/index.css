@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Flex:opsz,wght@8..144,100;8..144,200;8..144,300;8..144,400;8..144,500;8..144,600;8..144,700;8..144,800;8..144,900;8..144,1000&family=Roboto+Serif:ital,opsz,wght@0,8..144,100;0,8..144,200;0,8..144,300;0,8..144,400;0,8..144,500;0,8..144,600;0,8..144,700;0,8..144,800;0,8..144,900;1,8..144,100;1,8..144,200;1,8..144,300;1,8..144,400;1,8..144,500;1,8..144,600;1,8..144,700;1,8..144,800;1,8..144,900&display=swap");
 :root {
+    --text-dark: #221010;
     --text: #ffeade;
     --text-50: #f6eeee;
     --text-100: #eedddd;
@@ -182,6 +183,15 @@ nav {
         text-decoration: none;
         cursor: pointer;
     }
+    button,
+    a {
+        transition: 0.15s ease;
+    }
+    button:hover,
+    a:hover {
+        filter: brightness(0.7);
+    }
+
     .logo {
         color: var(--background, #ffeade);
         text-shadow: 0px 0px 70px rgba(0, 0, 0, 1);
@@ -475,6 +485,46 @@ footer {
 }
 .small-loading-anim {
     color: var(--text);
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     animation: rotate 2s ease infinite;
+}
+
+.gap-1 {
+    gap: 1rem;
+}
+
+h3 {
+    color: var(--text-950);
+    font-family: "Roboto Flex";
+    font-size: 1.5rem;
+    font-weight: 900;
+}
+
+.p-default {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 129.167%;
+    letter-spacing: 0.075rem;
+}
+
+.flex-button-orange {
+    width: 100%;
+    padding: 0.75rem 1rem;
+
+    border-radius: 10px;
+    border: 3px solid transparent;
+
+    background-color: var(--background-300);
+    color: var(--background);
+
+    font-family: "Roboto Flex";
+    font-size: 1.25rem;
+    font-weight: 800;
+
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.15s ease;
+}
+.flex-button-orange:hover {
+    background-color: var(--background-400);
 }

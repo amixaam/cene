@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->string("file_path");
-            $table->foreignId('genre_id')->constrained();
+            $table->foreignId('genre_id')->nullable()->constrained();
             $table->foreignId('age_rating_id')->nullable()->constrained();
             $table->string('name');
             $table->text('description');

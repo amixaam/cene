@@ -1,0 +1,21 @@
+.input-container {
+    width: 100%;
+
+    .text-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    input,
+    select {
+    }
+
+    .error {
+        height: 2ch;
+        font-size: 0.75rem;
+    }
+
+    .display-name {
+        text-transform: capitalize;
+    }
+}

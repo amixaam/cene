@@ -167,3 +167,125 @@
         }
     }
 }
+
+.event-review-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+    background-color: var(--background-100);
+    padding: 1rem;
+    border-radius: 15px;
+
+    .review-title {
+        background-color: var(--background-100);
+        padding: 0.25rem 1rem;
+        width: fit-content;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        align-items: center;
+        h3 {
+            color: var(--text-950);
+            font-family: "Roboto Flex";
+            font-size: 1.5rem;
+            font-weight: 900;
+            line-height: 100%;
+            letter-spacing: 2px;
+        }
+        .stars-wrapper {
+            i {
+                color: var(--text-950);
+                font-size: 1.1rem;
+            }
+        }
+    }
+
+    p {
+        background-color: var(--background-200);
+        padding: 1rem;
+        border-radius: 15px;
+        color: var(--text-950);
+        opacity: 0.8;
+        align-self: stretch;
+
+        text-align: justify;
+        font-family: "Roboto Serif";
+        font-size: 0.9rem;
+        font-weight: 500;
+        line-height: 129.167%;
+        letter-spacing: 1.2px;
+    }
+}
+
+.create-review-form {
+    display: grid;
+    grid-template-rows: 1fr;
+
+    background-color: var(--background-100);
+    padding: 1rem;
+    border-radius: 30px;
+
+    input {
+        padding: 0.5rem 1rem;
+        border-radius: 15px;
+        background-color: var(--background-100);
+
+        color: var(--text-950);
+        opacity: 0.8;
+        align-self: stretch;
+
+        text-align: justify;
+        font-family: "Roboto Serif";
+        font-size: 0.9rem;
+        font-weight: 500;
+        line-height: 129.167%;
+        letter-spacing: 1.2px;
+
+        border: none;
+        outline: none;
+    }
+
+    .hidden-review {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: 0.3s ease;
+
+        div {
+            display: flex;
+            gap: 1rem;
+            .title-input {
+                background-color: var(--background-200);
+            }
+            overflow: hidden;
+        }
+
+        .star-form {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .flex-button-review {
+            display: flex;
+            padding: 0.25rem 1.25rem;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            border: none;
+            background-color: var(--background-200);
+            color: var(--background, #ffeade);
+            text-align: center;
+            font-family: "Roboto Flex";
+            font-size: 1.25rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-decoration: none;
+        }
+    }
+    .form-active {
+        margin-top: 1rem;
+        grid-template-rows: 1fr;
+    }
+}
