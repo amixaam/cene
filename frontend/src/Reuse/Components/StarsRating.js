@@ -2,6 +2,7 @@ const StarsRating = ({ rating, avg = false }) => {
     if (!rating || rating.length === 0) return "No rating";
 
     if (!avg) {
+        rating = Math.round(rating);
         const filledStars = Array.from(
             { length: Math.floor(rating) },
             (_, index) => <i className="bi bi-star-fill" key={index}></i>

@@ -4,6 +4,9 @@ import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 import GetEventByID from "../../Database/API/GetEventByID";
+import Get from "../../Database/API/Get";
+import Post from "../../Database/API/Post";
+import Delete from "../../Database/API/Delete";
 
 import ConvertTime from "../../Reuse/Components/ConvertTime";
 import StarsRating from "../../Reuse/Components/StarsRating";
@@ -11,15 +14,19 @@ import SeatingChart from "../../Reuse/Components/SeatingChart";
 
 import "../../CSS/Event.scss";
 import NavPadding from "../../Reuse/Components/NavPadding";
-import GetReviews from "../../Database/API/GetReviews";
+import StarForm from "../../Reuse/Components/StarForm";
 
 export default function Event({ handleLoginPopup }) {
     const { e: event_id } = useParams();
 
     const [isInputActive, setInputActive] = useState(false);
+    const [rating, setRating] = useState(0);
+    const [title, settitle] = useState("");
+    const [description, setdescription] = useState("");
+    const [deleteButtonLoading, setdeleteButtonLoading] = useState(null);
 
     const { data, error, isLoading } = useQuery({
-        queryKey: ["payment", "success", event_id],
+        queryKey: ["event", "data", event_id],
         queryFn: () => {
             return GetEventByID(event_id);
         },
@@ -29,12 +36,29 @@ export default function Event({ handleLoginPopup }) {
         data: reviewData,
         error: reviewError,
         isLoading: reviewisLoading,
+        refetch: reviewRefetch,
     } = useQuery({
-        queryKey: ["refiews"],
-        queryFn: GetReviews,
+        queryKey: ["reviews", "event"],
+        queryFn: async () => {
+            return await Get(`reviews/${event_id}`);
+        },
     });
 
-    if (isLoading || reviewisLoading) {
+    const {
+        data: validateReviewData,
+        error: validateReviewError,
+        isLoading: validateReviewisLoading,
+    } = useQuery({
+        queryKey: ["reviews", "validate"],
+        queryFn: async () => {
+            const token = sessionStorage.getItem("token");
+            return await Post(`reviews/validate`, token, {
+                event_id: event_id,
+            });
+        },
+    });
+
+    if (isLoading || reviewisLoading || validateReviewisLoading) {
         return (
             <div>
                 <NavPadding />
@@ -44,7 +68,6 @@ export default function Event({ handleLoginPopup }) {
             </div>
         );
     }
-    console.log(reviewData);
     const getTicketTypeIdByName = (name) => {
         // Sort ticketTypes by price in ascending order
         const sortedTicketTypes = [...data.ticketTypes].sort(
@@ -72,6 +95,38 @@ export default function Event({ handleLoginPopup }) {
     const formattedRange = `${formattedStartTime} - ${formattedEndTime}`;
 
     const lowestPrice = Math.min(...data.ticketTypes.map((type) => type.price));
+
+    const handleCreateReview = async () => {
+        const token = sessionStorage.getItem("token");
+        const data = {
+            event_id: event_id,
+            title: title,
+            description: description,
+            rating: rating,
+        };
+        const response = Post("reviews/", token, data);
+        setInputActive(false);
+        settitle("");
+        setdescription("");
+        setRating(0);
+        await reviewRefetch();
+    };
+
+    const deleteReview = async (id) => {
+        setdeleteButtonLoading(id);
+        const token = sessionStorage.getItem("token");
+        const response = Delete(`reviews`, token, id);
+        await reviewRefetch();
+        setdeleteButtonLoading(null);
+    };
+
+    const handleTitleChange = (e) => {
+        settitle(e.target.value);
+    };
+
+    const handleDescriptionChange = (e) => {
+        setdescription(e.target.value);
+    };
     return (
         <div className="event-view-wrapper">
             <img src={data["event"].file_path} alt="" />
@@ -102,17 +157,35 @@ export default function Event({ handleLoginPopup }) {
                         </div>
                     </div>
                     <div className="statistics-wrapper">
-                        <p>Genre: {data["event"].genre.name}</p>
+                        <p>
+                            Genre:{" "}
+                            {data["event"].genre
+                                ? data["event"].genre.name
+                                : "None"}
+                        </p>
                         <div className="divider"></div>
                         <p>
                             {data["event"].date} • {formattedRange}
                         </p>
                         <div className="divider"></div>
-                        <p>Age rating: {data["event"].age_rating.name}</p>
+                        <p>
+                            Age rating:{" "}
+                            {data["event"].age_rating
+                                ? data["event"].age_rating.name
+                                : "None"}
+                        </p>
                     </div>
                     <div className="description-wrapper">
                         {data["event"].description}
                     </div>
+                </div>
+                <div className="image-wrapper">
+                    <h2>Images & Trailers</h2>
+                    <img
+                        className="image"
+                        src={data["event"].file_path}
+                        alt=""
+                    />
                 </div>
                 <div className="seat-wrapper">
                     <h2>Seat information</h2>
@@ -142,39 +215,62 @@ export default function Event({ handleLoginPopup }) {
                 </div>
                 <div className="review-wrapper">
                     <h2>Reviews</h2>
-                    <div
-                        className="create-review-form"
-                        onFocus={() => {
-                            setInputActive(true);
-                        }}
-                        onBlur={() => {
-                            setInputActive(false);
-                        }}
-                    >
-                        <input type="text" placeholder="Leave your review..." />
+                    {validateReviewData.message ? (
                         <div
-                            className={`hidden-review ${
-                                isInputActive ? "form-active" : ""
-                            }`}
+                            className="create-review-form"
+                            onFocus={() => {
+                                setInputActive(true);
+                            }}
                         >
-                            <div>
-                                <input
-                                    type="text"
-                                    className="title-input"
-                                    placeholder="Title"
-                                />
-                                <div className="star-form">
-                                    <i className="bi bi-star"></i>
-                                    <i className="bi bi-star"></i>
-                                    <i className="bi bi-star"></i>
-                                    <i className="bi bi-star"></i>
-                                    <i className="bi bi-star"></i>
+                            <input
+                                type="text"
+                                value={description}
+                                onChange={handleDescriptionChange}
+                                placeholder="Leave your review..."
+                            />
+                            <div
+                                className={`hidden-review ${
+                                    isInputActive ? "form-active" : ""
+                                }`}
+                            >
+                                <div>
+                                    <input
+                                        type="text"
+                                        className="title-input"
+                                        placeholder="Title"
+                                        value={title}
+                                        onChange={handleTitleChange}
+                                    />
+                                    <StarForm
+                                        rating={rating}
+                                        setRating={setRating}
+                                    />
+                                    <button
+                                        className={`flex-button-review ${
+                                            title && rating && description
+                                                ? ""
+                                                : "disabled"
+                                        }`}
+                                        disabled={
+                                            title && rating && description
+                                                ? ""
+                                                : "true"
+                                        }
+                                        onClick={handleCreateReview}
+                                    >
+                                        Submit
+                                    </button>
                                 </div>
-                                <button className="flex-button-review">
-                                    Submit
-                                </button>
                             </div>
                         </div>
+                    ) : (
+                        "Log in and purchase tickets to add reviews!"
+                    )}
+
+                    <div className="no-reviews">
+                        {reviewData.length === 0
+                            ? "No comments yet, be the first!"
+                            : ""}
                     </div>
                     {reviewData.map((review) => {
                         return (
@@ -182,9 +278,31 @@ export default function Event({ handleLoginPopup }) {
                                 key={review.id}
                                 className="event-review-container"
                             >
-                                <div className="review-title">
-                                    <h3>{review.user.name}</h3>
-                                    <StarsRating rating={review.rating} />
+                                <div className="review-top">
+                                    <div className="review-title">
+                                        <h3>{review.title}</h3>
+                                        <StarsRating rating={review.rating} />
+                                    </div>
+                                    <div>
+                                        {review.user_id ==
+                                        sessionStorage.getItem("user_id") ? (
+                                            <button
+                                                className="flex-button-orange"
+                                                onClick={() => {
+                                                    deleteReview(review.id);
+                                                }}
+                                            >
+                                                {deleteButtonLoading ===
+                                                review.id ? (
+                                                    <i className="bi bi-arrow-clockwise small-loading-anim"></i>
+                                                ) : (
+                                                    "X"
+                                                )}
+                                            </button>
+                                        ) : (
+                                            ""
+                                        )}
+                                    </div>
                                 </div>
                                 <p>{review.description}</p>
                             </div>

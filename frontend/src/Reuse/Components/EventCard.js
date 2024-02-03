@@ -24,8 +24,7 @@ export default function EventCard({ data, handleEventRedirect }) {
             <div
                 className="card-image"
                 style={{
-                    background: `linear-gradient(180deg, rgba(26, 9, 0, 0.00) 52.1%, #1A0900 100%), 
-                    linear-gradient(0deg, rgba(26, 9, 0, 0.35) 0%, rgba(26, 9, 0, 0.35) 100%), 
+                    background: `var(--card-gradient), 
                     url(${data.file_path})`,
                     backgroundSize: "cover",
                 }}

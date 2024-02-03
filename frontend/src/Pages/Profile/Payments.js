@@ -65,12 +65,12 @@ export default function Payments() {
 
     return (
         <>
-            <h3>Payments</h3>
+            <h2>Payments</h2>
             {paymentData.data.map((payment, index) => (
                 <div className="payment-wrapper" key={index.id}>
-                    <h1>
+                    <h3>
                         {payment.event.name} • {payment.amount}€
-                    </h1>
+                    </h3>
                     <button
                         className="flex-button"
                         onClick={() => {

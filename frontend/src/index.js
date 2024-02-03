@@ -36,7 +36,6 @@ import Edit from "./Pages/Edit";
 
 const App = () => {
     const location = useLocation();
-    const [theme, setTheme] = useLocalStorage("theme" ? "light" : "dark");
     const [isScrolled, setIsScrolled] = useState(false);
 
     const [loginPopup, setLoginPopup] = useState(false);
@@ -191,7 +190,7 @@ const App = () => {
     };
 
     return (
-        <div data-theme={theme} className="wrap">
+        <div className="wrap">
             <ReactModal
                 isOpen={loginPopup}
                 onRequestClose={toggleLoginOpen}

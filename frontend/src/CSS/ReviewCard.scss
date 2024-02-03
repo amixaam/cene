@@ -1,4 +1,4 @@
-    .review-card-wrapper {
+.review-card-wrapper {
     display: grid;
     grid-template-columns: auto 1fr;
     width: 100%;
@@ -51,6 +51,7 @@
                 font-weight: 900;
                 line-height: 100%;
                 letter-spacing: 2px;
+                text-transform: capitalize;
             }
 
             .stars-wrapper {

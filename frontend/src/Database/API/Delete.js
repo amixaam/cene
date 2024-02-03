@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export default async function Delete(endpoint, auth = "", data) {
+export default async function Delete(endpoint, auth = "", data = "") {
     if (auth) auth = `Bearer ${auth}`;
 
     const headers = {

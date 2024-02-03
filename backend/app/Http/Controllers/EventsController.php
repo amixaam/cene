@@ -43,7 +43,9 @@ class EventsController extends Controller
 
     public function getGenres()
     {
-        $events = Event::with("genre")->get();
+        $events = Event::with("genre")
+            ->where("genre_id", "!=", null)
+            ->get();
         $genres = [];
         foreach ($events as $key => $value) {
             $genres[$value->genre->id] = $value->genre->name;
@@ -51,6 +53,88 @@ class EventsController extends Controller
 
         return response()->json($genres);
     }
+
+    public function GetReview($id)
+    {
+        $reviews = Review::with('user')
+            ->where('event_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return response()->json($reviews);
+    }
+
+    public function canUserPostReview(Request $request)
+    {
+        try {
+            $request->validate([
+                'event_id' => 'required|exists:events,id', // Assuming the table name is 'events'
+            ]);
+
+            $userId = auth()->user()->id;
+
+            $order = Order::where('user_id', $userId)
+                ->where('event_id', $request->event_id)
+                ->where('status', 'paid')
+                ->first();
+
+            if ($order) {
+                // User has a valid order for the event
+                return response()->json(['message' => 'Can create review']);
+            } else {
+                // User doesn't have a valid order for the event
+                return response()->json(['errors' => 'User does not have a valid order for this event'], 403);
+            }
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['errors' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function postReview(Request $request)
+    {
+        try {
+            $request->validate([
+                'event_id' => 'required|exists:events,id',
+                'title' => 'required|string|min:1',
+                'description' => 'required|string|min:1',
+                'rating' => 'required|integer|min:1|max:5',
+            ]);
+
+            $userId = auth()->user()->id;
+
+            $request->merge(['user_id' => $userId]); // Corrected merge syntax
+
+            Review::create($request->all());
+
+            return response()->json(['message' => 'Review created successfully!']);
+        } catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        }
+    }
+
+    public function deleteReview($id)
+    {
+        try {
+            $userId = auth()->user()->id;
+
+            $review = Review::where('user_id', $userId)
+                ->where('id', $id)
+                ->first();
+
+            if (!$review) {
+                return response()->json(['errors' => 'Review not found or unauthorized'], 404);
+            }
+
+            $review->delete();
+
+            return response()->json(['message' => 'Review deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['errors' => $e->getMessage()], 500);
+        }
+    }
+
 
     public function getTypes($event_id)
     {
@@ -238,7 +322,10 @@ class EventsController extends Controller
 
     public function getRandomReview()
     {
-        $review = Review::with('event')->inRandomOrder()->first();
+        $review = Review::with('event')
+            ->where('rating', ">=", 4)
+            ->inRandomOrder()
+            ->first();
         return response()->json($review);
     }
 

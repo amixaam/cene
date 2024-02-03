@@ -64,6 +64,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [AgeRatingController::class, 'destroy']);
         Route::put('/{id}', [AgeRatingController::class, 'update']);
     });
+
+    Route::prefix('/reviews')->group(function () {
+        Route::post('/', [EventsController::class, 'PostReview']);
+        Route::delete('/{id}', [EventsController::class, 'DeleteReview']);
+        Route::post('/validate', [EventsController::class, 'CanUserPostReview']);
+    });
 });
 
 // GUEST ACTIONS
@@ -89,6 +95,7 @@ Route::prefix('/events')->group(function () {
 Route::prefix('/reviews')->group(function () {
     Route::get('/random', [EventsController::class, 'getRandomReview']);
     Route::get('/', [EventsController::class, 'getAllReviews']);
+    Route::get('/{id}', [EventsController::class, 'GetReview']);
 });
 
 Route::prefix('/genres')->group(function () {

@@ -57,8 +57,22 @@ export default function Pay() {
     }
 
     const getTicketTypeIdByName = (name) => {
-        const index = data.ticketTypes.findIndex((type) => type.name === name);
-        return index !== -1 ? index : null;
+        // Sort ticketTypes by price in ascending order
+        const sortedTicketTypes = [...data.ticketTypes].sort(
+            (a, b) => a.price - b.price
+        );
+
+        // Assign IDs from 1 to 4
+        const ticketTypesWithIds = sortedTicketTypes.map((type, index) => ({
+            ...type,
+            id: index + 1,
+        }));
+
+        // Find the ID by name
+        const foundType = ticketTypesWithIds.find((type) => type.name === name);
+
+        // Return the ID if found, otherwise return null
+        return foundType ? foundType.id : null;
     };
 
     const handlePurchaseRedirect = async () => {
@@ -103,7 +117,11 @@ export default function Pay() {
                         </div>
                         {data.ticketTypes.map((type) => (
                             <div key={type.id} className="type">
-                                <div className={`square type-${type.id}`}></div>
+                                <div
+                                    className={`square type-${getTicketTypeIdByName(
+                                        type.name
+                                    )}`}
+                                ></div>
                                 <p>{type.name}</p>
                                 <p>{type.price} €</p>
                             </div>
