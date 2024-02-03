@@ -4,6 +4,7 @@ School project - A website for event ticket purchase
 made in a week.
 ## Includes: 
 * Stripe integration
+* Stripe Webhooks
 * PDF/QR code for boughts tickets
 * Seat selector when buying
 * Admin panel for events
