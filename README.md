@@ -12,8 +12,7 @@ made in a week.
 * Filter events by genre and or search
 * Reviews for ticket owners
 * Custom ticket types
-* Custom genres
-* Custom age ratings
+* Custom genres and age ratings
 * Custom seat amount
 
 ## Screenshots from the website
